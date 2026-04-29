@@ -1118,31 +1118,59 @@ b, strong { color: var(--white); }
 }
 #nav-backdrop.open { opacity: 1; pointer-events: all; }
 
-/* ── PROFILE BLOCK (Follow me slide) ── */
-.profile-block {
+/* ── FOLLOW ME · 3-column layout (QRs · photo · QRs) ── */
+.follow-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr 160px;
+  gap: 36px;
+  width: 100%;
+  max-width: 760px;
+  margin: 18px auto 0;
+  align-items: center;
+}
+.follow-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.follow-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  margin: 18px 0 8px;
+  gap: 10px;
+  padding: 0 8px;
 }
 .profile-photo {
-  width: 130px;
-  height: 130px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   border: 3px solid var(--orange);
   object-fit: cover;
-  filter: drop-shadow(0 8px 28px rgba(255,94,26,0.3));
+  filter: drop-shadow(0 8px 28px rgba(255,94,26,0.35));
   background: white;
 }
 .profile-name {
-  font-family: 'Sora'; font-weight: 800; font-size: 28px;
-  letter-spacing: -0.5px;
+  font-family: 'Sora'; font-weight: 800; font-size: 26px;
+  letter-spacing: -0.3px;
+  line-height: 1;
+  margin-top: 4px;
+  text-align: center;
 }
 .profile-tag {
-  font-family: 'Sora'; font-size: 11px; letter-spacing: 2px;
+  font-family: 'Sora'; font-size: 10px; letter-spacing: 1.8px;
   color: var(--muted); text-transform: uppercase;
-  margin-top: -4px;
+  text-align: center;
+}
+.slide.active .profile-photo { animation: scaleIn 0.6s cubic-bezier(.2,1.4,.4,1) 0.18s both; }
+.slide.active .profile-name { animation: fadeUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
+.slide.active .profile-tag { animation: fadeUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.38s both; }
+.slide.active .follow-side:first-child .social-card:nth-child(1) { animation: slideLeft 0.5s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
+.slide.active .follow-side:first-child .social-card:nth-child(2) { animation: slideLeft 0.5s cubic-bezier(.2,1.2,.4,1) 0.42s both; }
+.slide.active .follow-side:last-child .social-card:nth-child(1) { animation: slideRight 0.5s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
+.slide.active .follow-side:last-child .social-card:nth-child(2) { animation: slideRight 0.5s cubic-bezier(.2,1.2,.4,1) 0.42s both; }
+@media (max-width: 760px) {
+  .follow-grid { grid-template-columns: 1fr; max-width: 380px; }
+  .follow-side { flex-direction: row; }
 }
 .slide.active .profile-photo { animation: scaleIn 0.6s cubic-bezier(.2,1.4,.4,1) 0.18s both; }
 .slide.active .profile-name { animation: fadeUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
@@ -2909,32 +2937,36 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
   <div class="eyebrow">Stay connected</div>
   <h1>Follow me on <span class="o">socials</span>.</h1>
   <div class="cover-rule"></div>
-  <div class="profile-block">
-    <img class="profile-photo" src="shaid-photo.jpeg" alt="Shaid">
-    <div class="profile-name">Shaid</div>
-    <div class="profile-tag">AI · Builder · Storyteller</div>
-  </div>
-  <div class="social-grid">
-    <a class="social-card website" href="https://www.shaid360.com" target="_blank" rel="noopener">
-      <div class="qr-wrap"><img src="qr-website.svg" alt="Website QR"></div>
-      <div class="platform">Website</div>
-      <div class="handle">shaid360.com</div>
-    </a>
-    <a class="social-card linkedin" href="https://www.linkedin.com/in/shaid360" target="_blank" rel="noopener">
-      <div class="qr-wrap"><img src="qr-linkedin.svg" alt="LinkedIn QR"></div>
-      <div class="platform">LinkedIn</div>
-      <div class="handle">/in/shaid360</div>
-    </a>
-    <a class="social-card instagram" href="https://www.instagram.com/ai360_with_shaid" target="_blank" rel="noopener">
-      <div class="qr-wrap"><img src="qr-instagram.svg" alt="Instagram QR"></div>
-      <div class="platform">Instagram</div>
-      <div class="handle">@ai360_with_shaid</div>
-    </a>
-    <a class="social-card youtube" href="https://youtube.com/@ai360_with_shaid" target="_blank" rel="noopener">
-      <div class="qr-wrap"><img src="qr-youtube.svg" alt="YouTube QR"></div>
-      <div class="platform">YouTube</div>
-      <div class="handle">@ai360_with_shaid</div>
-    </a>
+  <div class="follow-grid">
+    <div class="follow-side">
+      <a class="social-card website" href="https://www.shaid360.com" target="_blank" rel="noopener">
+        <div class="qr-wrap"><img src="qr-website.svg" alt="Website QR"></div>
+        <div class="platform">Website</div>
+        <div class="handle">shaid360.com</div>
+      </a>
+      <a class="social-card linkedin" href="https://www.linkedin.com/in/shaid360" target="_blank" rel="noopener">
+        <div class="qr-wrap"><img src="qr-linkedin.svg" alt="LinkedIn QR"></div>
+        <div class="platform">LinkedIn</div>
+        <div class="handle">/in/shaid360</div>
+      </a>
+    </div>
+    <div class="follow-center">
+      <img class="profile-photo" src="shaid-photo.jpeg" alt="Shaid">
+      <div class="profile-name">Shaid</div>
+      <div class="profile-tag">AI · Builder · Storyteller</div>
+    </div>
+    <div class="follow-side">
+      <a class="social-card instagram" href="https://www.instagram.com/ai360_with_shaid" target="_blank" rel="noopener">
+        <div class="qr-wrap"><img src="qr-instagram.svg" alt="Instagram QR"></div>
+        <div class="platform">Instagram</div>
+        <div class="handle">@ai360_with_shaid</div>
+      </a>
+      <a class="social-card youtube" href="https://youtube.com/@ai360_with_shaid" target="_blank" rel="noopener">
+        <div class="qr-wrap"><img src="qr-youtube.svg" alt="YouTube QR"></div>
+        <div class="platform">YouTube</div>
+        <div class="handle">@ai360_with_shaid</div>
+      </a>
+    </div>
   </div>
 </section>
 

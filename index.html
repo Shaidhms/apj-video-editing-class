@@ -1240,49 +1240,56 @@ b, strong { color: var(--white); }
 .slide.active .reel-card:nth-child(4) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.50s both; }
 .slide.active .reel-card:nth-child(5) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.60s both; }
 
-/* ── FOLLOW ME · 3-column layout (QRs · photo · QRs) ── */
+/* ── FOLLOW ME · 3-column layout (QRs · photo · QRs) — compact ── */
 .follow-grid {
   display: grid;
-  grid-template-columns: 160px 1fr 160px;
-  gap: 36px;
+  grid-template-columns: 150px 1fr 150px;
+  gap: 28px;
   width: 100%;
-  max-width: 760px;
-  margin: 18px auto 0;
+  max-width: 740px;
+  margin: 12px auto 0;
   align-items: center;
 }
 .follow-side {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 .follow-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 0 8px;
+  gap: 8px;
+  padding: 0 4px;
 }
 .profile-photo {
-  width: 150px;
-  height: 150px;
+  width: 124px;
+  height: 124px;
   border-radius: 50%;
   border: 3px solid var(--orange);
   object-fit: cover;
-  filter: drop-shadow(0 8px 28px rgba(255,94,26,0.35));
+  filter: drop-shadow(0 8px 24px rgba(255,94,26,0.35));
   background: white;
 }
 .profile-name {
-  font-family: 'Sora'; font-weight: 800; font-size: 26px;
+  font-family: 'Sora'; font-weight: 800; font-size: 22px;
   letter-spacing: -0.3px;
   line-height: 1;
-  margin-top: 4px;
+  margin-top: 6px;
   text-align: center;
 }
 .profile-tag {
-  font-family: 'Sora'; font-size: 10px; letter-spacing: 1.8px;
+  font-family: 'Sora'; font-size: 9.5px; letter-spacing: 1.4px;
   color: var(--muted); text-transform: uppercase;
   text-align: center;
+  line-height: 1.5;
+  font-weight: 600;
 }
+.profile-tag .accent { color: var(--orange); }
+/* Tighten the headline + cover-rule on this slide so content doesn't bleed */
+.slide[data-label="FOLLOW ME"] h1 { font-size: clamp(32px, 4.2vw, 56px); margin-bottom: 14px; }
+.slide[data-label="FOLLOW ME"] .cover-rule { margin: 14px auto 18px; }
+.slide[data-label="FOLLOW ME"] .eyebrow { margin-bottom: 12px; }
 .slide.active .profile-photo { animation: scaleIn 0.6s cubic-bezier(.2,1.4,.4,1) 0.18s both; }
 .slide.active .profile-name { animation: fadeUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
 .slide.active .profile-tag { animation: fadeUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.38s both; }
@@ -3148,7 +3155,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     <div class="follow-center">
       <img class="profile-photo" src="shaid-photo.jpeg" alt="Shaid">
       <div class="profile-name">Shaid</div>
-      <div class="profile-tag">AI · Builder · Storyteller</div>
+      <div class="profile-tag">AI Specialist <span class="accent">·</span> Gen AI Architect<br>AI Builder <span class="accent">·</span> AI Educator</div>
     </div>
     <div class="follow-side">
       <a class="social-card instagram" href="https://www.instagram.com/ai360_with_shaid" target="_blank" rel="noopener">

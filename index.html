@@ -1125,16 +1125,44 @@ b, strong { color: var(--white); }
   max-width: 980px;
   margin: 22px auto 0;
 }
+/* Edge fade gradients · hint that content is scrollable */
+.reel-carousel::before, .reel-carousel::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 60px;
+  pointer-events: none;
+  z-index: 4;
+  transition: opacity 0.25s ease;
+}
+.reel-carousel::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg) 5%, transparent 100%);
+  opacity: 0;
+}
+.reel-carousel::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg) 5%, transparent 100%);
+  opacity: 1;
+}
+.reel-carousel.at-start::before { opacity: 0; }
+.reel-carousel.at-end::after { opacity: 0; }
+.reel-carousel:not(.at-start)::before { opacity: 1; }
 .reel-track {
   display: flex;
   gap: 20px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding: 10px 8px 14px;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.18) transparent;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
-.reel-track::-webkit-scrollbar { display: none; }
+.reel-track::-webkit-scrollbar { height: 5px; }
+.reel-track::-webkit-scrollbar-track { background: transparent; }
+.reel-track::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 3px; }
+.reel-track::-webkit-scrollbar-thumb:hover { background: var(--orange); }
 .reel-card {
   flex: 0 0 auto;
   width: 200px;
@@ -3306,15 +3334,35 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     frame.addEventListener('touchstart', tryPlay, { passive: true });
   });
 
-  // Slider arrows
+  // Slider arrows + wheel scroll + dynamic edge fade
   const reelTrack = document.getElementById('reelTrack');
-  if (reelTrack) {
+  const reelCarousel = reelTrack?.parentElement;
+  if (reelTrack && reelCarousel) {
+    const STEP = 220; // card width + gap
     document.querySelector('.reel-arrow.prev')?.addEventListener('click', () => {
-      reelTrack.scrollBy({ left: -220, behavior: 'smooth' });
+      reelTrack.scrollBy({ left: -STEP, behavior: 'smooth' });
     });
     document.querySelector('.reel-arrow.next')?.addEventListener('click', () => {
-      reelTrack.scrollBy({ left: 220, behavior: 'smooth' });
+      reelTrack.scrollBy({ left: STEP, behavior: 'smooth' });
     });
+    // Mouse wheel · translate vertical wheel into horizontal scroll
+    reelTrack.addEventListener('wheel', (e) => {
+      // Only intercept if the user is scrolling vertically (deltaY dominant)
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        reelTrack.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+    // Edge-fade visibility based on scroll position
+    const updateEdges = () => {
+      const atStart = reelTrack.scrollLeft <= 4;
+      const atEnd = reelTrack.scrollLeft + reelTrack.clientWidth >= reelTrack.scrollWidth - 4;
+      reelCarousel.classList.toggle('at-start', atStart);
+      reelCarousel.classList.toggle('at-end', atEnd);
+    };
+    reelTrack.addEventListener('scroll', updateEdges, { passive: true });
+    window.addEventListener('resize', updateEdges);
+    updateEdges();
   }
 </script>
 

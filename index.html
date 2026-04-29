@@ -2007,7 +2007,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     <div class="reel-track" id="reelTrack">
       <div class="reel-card r1">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="course-reels/reel-1.mp4"></video>
+          <video loop playsinline preload="none" data-src="course-reels/reel-1.mp4"></video>
           <div class="reel-placeholder"><div class="num">01</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2015,7 +2015,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r2">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="course-reels/reel-2.mp4"></video>
+          <video loop playsinline preload="none" data-src="course-reels/reel-2.mp4"></video>
           <div class="reel-placeholder"><div class="num">02</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2023,7 +2023,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r3">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="course-reels/reel-3.mp4"></video>
+          <video loop playsinline preload="none" data-src="course-reels/reel-3.mp4"></video>
           <div class="reel-placeholder"><div class="num">03</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2031,7 +2031,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r4">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="course-reels/reel-4.mp4"></video>
+          <video loop playsinline preload="none" data-src="course-reels/reel-4.mp4"></video>
           <div class="reel-placeholder"><div class="num">04</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2039,7 +2039,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r5">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="course-reels/reel-5.mp4"></video>
+          <video loop playsinline preload="none" data-src="course-reels/reel-5.mp4"></video>
           <div class="reel-placeholder"><div class="num">05</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2047,7 +2047,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r1">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="course-reels/reel-6.mp4"></video>
+          <video loop playsinline preload="none" data-src="course-reels/reel-6.mp4"></video>
           <div class="reel-placeholder"><div class="num">06</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2055,7 +2055,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r2">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="course-reels/reel-7.mp4"></video>
+          <video loop playsinline preload="none" data-src="course-reels/reel-7.mp4"></video>
           <div class="reel-placeholder"><div class="num">07</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -3284,12 +3284,25 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     };
     const tryPlay = () => {
       ensureSrc();
+      v.muted = false;        // play WITH audio when user interacts
       const p = v.play();
-      if (p && p.catch) p.catch(err => console.warn('Reel play blocked:', err.message));
+      if (p && p.catch) {
+        p.catch(err => {
+          // Browser blocked unmuted autoplay — fall back to muted so something plays
+          console.warn('Unmuted play blocked, falling back to muted:', err.message);
+          v.muted = true;
+          v.play().catch(e => console.warn('Even muted play failed:', e.message));
+        });
+      }
     };
     frame.addEventListener('mouseenter', tryPlay);
     frame.addEventListener('mouseleave', () => { if (loaded) v.pause(); });
-    frame.addEventListener('click', (e) => { e.preventDefault(); tryPlay(); });
+    frame.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Click toggles: if paused → play with audio; if playing → pause
+      if (v.paused) tryPlay();
+      else v.pause();
+    });
     frame.addEventListener('touchstart', tryPlay, { passive: true });
   });
 

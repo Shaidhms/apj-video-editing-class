@@ -1246,6 +1246,41 @@ b, strong { color: var(--white); }
 .reel-arrow.prev { left: -16px; }
 .reel-arrow.next { right: -16px; }
 
+/* Custom always-visible scrollbar (macOS hides native one) */
+.reel-scrollbar {
+  width: 100%;
+  max-width: 580px;
+  margin: 14px auto 6px;
+  padding: 0 6px;
+}
+.reel-scrollbar-track {
+  position: relative;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.reel-scrollbar-thumb {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, var(--orange), var(--amber));
+  border-radius: 3px;
+  cursor: grab;
+  transition: filter 0.2s, transform 0.2s;
+  box-shadow: 0 0 10px rgba(255,94,26,0.4);
+}
+.reel-scrollbar-thumb:hover {
+  filter: brightness(1.15);
+  transform: scaleY(1.6);
+}
+.reel-scrollbar-thumb.dragging {
+  cursor: grabbing;
+  transform: scaleY(1.8);
+  filter: brightness(1.2);
+}
+
 .reel-hint {
   font-family: 'Sora'; font-size: 10px; letter-spacing: 1.5px;
   color: var(--muted); text-transform: uppercase;
@@ -2092,7 +2127,12 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     </div>
     <button class="reel-arrow next" aria-label="Next">›</button>
   </div>
-  <div class="reel-hint">Hover to play · click <kbd>‹</kbd> <kbd>›</kbd> to scroll · or tap on phone</div>
+  <div class="reel-scrollbar" id="reelScrollbar">
+    <div class="reel-scrollbar-track">
+      <div class="reel-scrollbar-thumb" id="reelScrollThumb"></div>
+    </div>
+  </div>
+  <div class="reel-hint">Hover to play · drag the slider to scroll · or use <kbd>‹</kbd> <kbd>›</kbd></div>
 </section>
 
 <!-- ============ 2. WORKSHOP AT A GLANCE ============ -->
@@ -3353,16 +3393,66 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
         reelTrack.scrollLeft += e.deltaY;
       }
     }, { passive: false });
-    // Edge-fade visibility based on scroll position
-    const updateEdges = () => {
+    // Edge-fade visibility + custom scrollbar thumb sync
+    const scrollThumb = document.getElementById('reelScrollThumb');
+    const scrollTrack = document.querySelector('.reel-scrollbar-track');
+    const updateUI = () => {
       const atStart = reelTrack.scrollLeft <= 4;
       const atEnd = reelTrack.scrollLeft + reelTrack.clientWidth >= reelTrack.scrollWidth - 4;
       reelCarousel.classList.toggle('at-start', atStart);
       reelCarousel.classList.toggle('at-end', atEnd);
+      // Sync custom scrollbar thumb
+      if (scrollThumb && reelTrack.scrollWidth > reelTrack.clientWidth) {
+        const ratio = reelTrack.clientWidth / reelTrack.scrollWidth;
+        const pos = reelTrack.scrollLeft / (reelTrack.scrollWidth - reelTrack.clientWidth);
+        scrollThumb.style.width = (ratio * 100) + '%';
+        scrollThumb.style.left = (pos * (100 - ratio * 100)) + '%';
+      }
     };
-    reelTrack.addEventListener('scroll', updateEdges, { passive: true });
-    window.addEventListener('resize', updateEdges);
-    updateEdges();
+    reelTrack.addEventListener('scroll', updateUI, { passive: true });
+    window.addEventListener('resize', updateUI);
+    setTimeout(updateUI, 100);
+
+    // Drag the custom scrollbar thumb
+    if (scrollThumb && scrollTrack) {
+      let dragging = false;
+      let dragStartX = 0;
+      let scrollStartLeft = 0;
+      const onPointerDown = (e) => {
+        dragging = true;
+        scrollThumb.classList.add('dragging');
+        dragStartX = (e.touches ? e.touches[0].pageX : e.pageX);
+        scrollStartLeft = reelTrack.scrollLeft;
+        e.preventDefault();
+      };
+      const onPointerMove = (e) => {
+        if (!dragging) return;
+        e.preventDefault();
+        const x = (e.touches ? e.touches[0].pageX : e.pageX);
+        const trackW = scrollTrack.offsetWidth;
+        const scrollableW = reelTrack.scrollWidth - reelTrack.clientWidth;
+        const dx = (x - dragStartX) * (scrollableW / trackW);
+        reelTrack.scrollLeft = scrollStartLeft + dx;
+      };
+      const onPointerUp = () => {
+        if (dragging) { dragging = false; scrollThumb.classList.remove('dragging'); }
+      };
+      scrollThumb.addEventListener('mousedown', onPointerDown);
+      scrollThumb.addEventListener('touchstart', onPointerDown, { passive: false });
+      window.addEventListener('mousemove', onPointerMove);
+      window.addEventListener('touchmove', onPointerMove, { passive: false });
+      window.addEventListener('mouseup', onPointerUp);
+      window.addEventListener('touchend', onPointerUp);
+
+      // Click on the track jumps the carousel to that position
+      scrollTrack.addEventListener('click', (e) => {
+        if (e.target === scrollThumb) return;
+        const rect = scrollTrack.getBoundingClientRect();
+        const ratio = (e.pageX - rect.left) / rect.width;
+        const scrollableW = reelTrack.scrollWidth - reelTrack.clientWidth;
+        reelTrack.scrollTo({ left: ratio * scrollableW, behavior: 'smooth' });
+      });
+    }
   }
 </script>
 

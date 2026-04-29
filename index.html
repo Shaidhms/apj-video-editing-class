@@ -1118,6 +1118,36 @@ b, strong { color: var(--white); }
 }
 #nav-backdrop.open { opacity: 1; pointer-events: all; }
 
+/* ── PROFILE BLOCK (Follow me slide) ── */
+.profile-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 8px;
+}
+.profile-photo {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 3px solid var(--orange);
+  object-fit: cover;
+  filter: drop-shadow(0 8px 28px rgba(255,94,26,0.3));
+  background: white;
+}
+.profile-name {
+  font-family: 'Sora'; font-weight: 800; font-size: 28px;
+  letter-spacing: -0.5px;
+}
+.profile-tag {
+  font-family: 'Sora'; font-size: 11px; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase;
+  margin-top: -4px;
+}
+.slide.active .profile-photo { animation: scaleIn 0.6s cubic-bezier(.2,1.4,.4,1) 0.18s both; }
+.slide.active .profile-name { animation: fadeUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
+.slide.active .profile-tag { animation: fadeUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.38s both; }
+
 /* ── SOCIAL CARDS (feedback slide · QR codes) ── */
 .social-grid {
   display: grid;
@@ -2868,7 +2898,22 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
   <div class="badge" style="background: linear-gradient(135deg, rgba(255,192,67,0.18), rgba(34,238,160,0.10)); border-color: rgba(255,192,67,0.4); color: var(--amber);">▸ One last minute</div>
   <h1>Feedback <span class="a">time.</span></h1>
   <div class="cover-rule"></div>
-  <p class="sub">How was the session? Rate the teaching, share what worked — and follow me on the socials.</p>
+  <p class="sub">How was the session? Rate the teaching, tell me what worked, what didn't — and what you'd want next.</p>
+  <p class="sub" style="margin-top: 18px; font-family: 'Sora'; font-style: italic; color: var(--mint); font-size: 17px;">Honest feedback makes the next class better.</p>
+</section>
+
+<!-- ============ CLOSING 4 · FOLLOW ME ============ -->
+<section class="slide" data-label="FOLLOW ME">
+  <div class="blob blob-o" style="top:-120px; left:-100px; width:380px; height:380px;"></div>
+  <div class="blob blob-s" style="bottom:-120px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow">Stay connected</div>
+  <h1>Follow me on <span class="o">socials</span>.</h1>
+  <div class="cover-rule"></div>
+  <div class="profile-block">
+    <img class="profile-photo" src="shaid-photo.jpeg" alt="Shaid">
+    <div class="profile-name">Shaid</div>
+    <div class="profile-tag">AI · Builder · Storyteller</div>
+  </div>
   <div class="social-grid">
     <a class="social-card website" href="https://www.shaid360.com" target="_blank" rel="noopener">
       <div class="qr-wrap"><img src="qr-website.svg" alt="Website QR"></div>

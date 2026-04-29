@@ -1118,6 +1118,128 @@ b, strong { color: var(--white); }
 }
 #nav-backdrop.open { opacity: 1; pointer-events: all; }
 
+/* ── REELS CAROUSEL ── */
+.reel-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 22px auto 0;
+}
+.reel-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 10px 8px 14px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.reel-track::-webkit-scrollbar { display: none; }
+.reel-card {
+  flex: 0 0 auto;
+  width: 200px;
+  scroll-snap-align: center;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.reel-frame {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--cborder);
+  background: var(--bg-deep, #07090F);
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.reel-frame:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(255,94,26,0.30);
+  border-color: var(--orange);
+}
+.reel-frame video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.reel-placeholder {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.92);
+  font-family: 'Sora'; font-weight: 700;
+  text-align: center; padding: 16px;
+  pointer-events: none;
+}
+.reel-placeholder .num { font-family: 'Sora'; font-weight: 800; font-size: 38px; line-height: 1; opacity: 0.5; }
+.reel-placeholder .label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 6px; }
+.reel-card.r1 .reel-placeholder { background: linear-gradient(180deg, #FF8C52, #B83A28 60%, #2a0a08); }
+.reel-card.r2 .reel-placeholder { background: linear-gradient(180deg, #38C9FF, #235260 60%, #0e1a1f); }
+.reel-card.r3 .reel-placeholder { background: linear-gradient(180deg, #9B6DFF, #5C3A8C 60%, #1a0e2c); }
+.reel-card.r4 .reel-placeholder { background: linear-gradient(180deg, #FFC043, #8e6e15 60%, #2C1004); }
+.reel-card.r5 .reel-placeholder { background: linear-gradient(180deg, #22EEA0, #0a4e2d 60%, #051a10); }
+.reel-frame .reel-play {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 0; height: 0;
+  border-left: 18px solid rgba(255,255,255,0.85);
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.reel-frame:hover .reel-play { opacity: 0.4; }
+.reel-frame.has-video .reel-placeholder, .reel-frame.has-video .reel-play { display: none; }
+.reel-caption {
+  font-family: 'Sora'; font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted);
+  text-align: center;
+}
+.reel-caption b { color: var(--cream, var(--white)); font-weight: 600; }
+
+.reel-arrow {
+  position: absolute; top: 38%; transform: translateY(-50%);
+  z-index: 5;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(7,9,15,0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--cborder-2, rgba(255,255,255,0.12));
+  color: var(--white);
+  font-family: 'Sora'; font-size: 18px; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, border-color 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.reel-arrow:hover {
+  background: var(--orange); border-color: var(--orange);
+  transform: translateY(-50%) scale(1.08);
+}
+.reel-arrow.prev { left: -16px; }
+.reel-arrow.next { right: -16px; }
+
+.reel-hint {
+  font-family: 'Sora'; font-size: 10px; letter-spacing: 1.5px;
+  color: var(--muted); text-transform: uppercase;
+  text-align: center; margin-top: 4px;
+}
+.reel-hint kbd {
+  background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px;
+  font-family: 'Sora'; color: var(--cream, var(--white)); margin: 0 2px;
+}
+
+@media (max-width: 760px) {
+  .reel-arrow { display: none; }
+  .reel-card { width: 170px; }
+}
+
+/* Stagger entrance for reel cards */
+.slide.active .reel-card:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.20s both; }
+.slide.active .reel-card:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
+.slide.active .reel-card:nth-child(3) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.40s both; }
+.slide.active .reel-card:nth-child(4) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.50s both; }
+.slide.active .reel-card:nth-child(5) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.60s both; }
+
 /* ── FOLLOW ME · 3-column layout (QRs · photo · QRs) ── */
 .follow-grid {
   display: grid;
@@ -1863,6 +1985,63 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     <div class="why-stat"><div class="v">3×</div><div class="k">more engagement than photos</div></div>
     <div class="why-stat"><div class="v">∞</div><div class="k">stories you can now tell</div></div>
   </div>
+</section>
+
+<!-- ============ 1c. MY REELS (showcase) ============ -->
+<section class="slide" data-label="MY REELS">
+  <div class="blob blob-o" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="blob blob-v" style="bottom:-100px; left:-100px; width:320px; height:320px;"></div>
+  <div class="eyebrow">My recent reels</div>
+  <h1>What you'll be able to <span class="o">make</span>.</h1>
+  <div class="cover-rule"></div>
+  <p class="sub">A few of my recent reels. Hover any one to play, swipe through with the arrows.</p>
+  <div class="reel-carousel">
+    <button class="reel-arrow prev" aria-label="Previous">‹</button>
+    <div class="reel-track" id="reelTrack">
+      <div class="reel-card r1">
+        <div class="reel-frame">
+          <video muted loop playsinline preload="metadata" data-src=""></video>
+          <div class="reel-placeholder"><div class="num">01</div><div class="label">Add reel link</div></div>
+          <div class="reel-play"></div>
+        </div>
+        <div class="reel-caption"><b>Reel #1</b> · drop your title</div>
+      </div>
+      <div class="reel-card r2">
+        <div class="reel-frame">
+          <video muted loop playsinline preload="metadata" data-src=""></video>
+          <div class="reel-placeholder"><div class="num">02</div><div class="label">Add reel link</div></div>
+          <div class="reel-play"></div>
+        </div>
+        <div class="reel-caption"><b>Reel #2</b> · drop your title</div>
+      </div>
+      <div class="reel-card r3">
+        <div class="reel-frame">
+          <video muted loop playsinline preload="metadata" data-src=""></video>
+          <div class="reel-placeholder"><div class="num">03</div><div class="label">Add reel link</div></div>
+          <div class="reel-play"></div>
+        </div>
+        <div class="reel-caption"><b>Reel #3</b> · drop your title</div>
+      </div>
+      <div class="reel-card r4">
+        <div class="reel-frame">
+          <video muted loop playsinline preload="metadata" data-src=""></video>
+          <div class="reel-placeholder"><div class="num">04</div><div class="label">Add reel link</div></div>
+          <div class="reel-play"></div>
+        </div>
+        <div class="reel-caption"><b>Reel #4</b> · drop your title</div>
+      </div>
+      <div class="reel-card r5">
+        <div class="reel-frame">
+          <video muted loop playsinline preload="metadata" data-src=""></video>
+          <div class="reel-placeholder"><div class="num">05</div><div class="label">Add reel link</div></div>
+          <div class="reel-play"></div>
+        </div>
+        <div class="reel-caption"><b>Reel #5</b> · drop your title</div>
+      </div>
+    </div>
+    <button class="reel-arrow next" aria-label="Next">›</button>
+  </div>
+  <div class="reel-hint">Hover to play · click <kbd>‹</kbd> <kbd>›</kbd> to scroll</div>
 </section>
 
 <!-- ============ 2. WORKSHOP AT A GLANCE ============ -->
@@ -3065,6 +3244,47 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
   document.querySelectorAll('#checklist .check-row').forEach(r => {
     r.addEventListener('click', () => r.classList.toggle('done'));
   });
+
+  // ===== Reels carousel · hover to play + slider arrows =====
+  document.querySelectorAll('.reel-frame').forEach(frame => {
+    const v = frame.querySelector('video');
+    if (!v) return;
+    // Lazily wire up data-src to actual src on first hover
+    const ensureSrc = () => {
+      const src = v.dataset.src;
+      if (src && !v.src) {
+        v.src = src;
+        frame.classList.add('has-video');
+      }
+    };
+    // Mark frames that already have a src from data-src on load
+    if (v.dataset.src) frame.classList.add('has-video');
+    frame.addEventListener('mouseenter', () => {
+      ensureSrc();
+      if (v.src) v.play().catch(() => {});
+    });
+    frame.addEventListener('mouseleave', () => {
+      if (v.src) { v.pause(); v.currentTime = 0; }
+    });
+    // Tap-to-toggle on mobile (no hover)
+    frame.addEventListener('click', () => {
+      ensureSrc();
+      if (!v.src) return;
+      if (v.paused) v.play().catch(() => {});
+      else v.pause();
+    });
+  });
+
+  // Slider arrows
+  const reelTrack = document.getElementById('reelTrack');
+  if (reelTrack) {
+    document.querySelector('.reel-arrow.prev')?.addEventListener('click', () => {
+      reelTrack.scrollBy({ left: -220, behavior: 'smooth' });
+    });
+    document.querySelector('.reel-arrow.next')?.addEventListener('click', () => {
+      reelTrack.scrollBy({ left: 220, behavior: 'smooth' });
+    });
+  }
 </script>
 
 </body>

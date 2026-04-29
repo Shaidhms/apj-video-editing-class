@@ -2007,7 +2007,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     <div class="reel-track" id="reelTrack">
       <div class="reel-card r1">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="reels/reel-1.mp4"></video>
+          <video muted loop playsinline preload="none" data-src="course-reels/reel-1.mp4"></video>
           <div class="reel-placeholder"><div class="num">01</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2015,7 +2015,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r2">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="reels/reel-2.mp4"></video>
+          <video muted loop playsinline preload="none" data-src="course-reels/reel-2.mp4"></video>
           <div class="reel-placeholder"><div class="num">02</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2023,7 +2023,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r3">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="reels/reel-3.mp4"></video>
+          <video muted loop playsinline preload="none" data-src="course-reels/reel-3.mp4"></video>
           <div class="reel-placeholder"><div class="num">03</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2031,7 +2031,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r4">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="reels/reel-4.mp4"></video>
+          <video muted loop playsinline preload="none" data-src="course-reels/reel-4.mp4"></video>
           <div class="reel-placeholder"><div class="num">04</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2039,7 +2039,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r5">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="reels/reel-5.mp4"></video>
+          <video muted loop playsinline preload="none" data-src="course-reels/reel-5.mp4"></video>
           <div class="reel-placeholder"><div class="num">05</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2047,7 +2047,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r1">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="reels/reel-6.mp4"></video>
+          <video muted loop playsinline preload="none" data-src="course-reels/reel-6.mp4"></video>
           <div class="reel-placeholder"><div class="num">06</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -2055,7 +2055,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       </div>
       <div class="reel-card r2">
         <div class="reel-frame">
-          <video muted loop playsinline preload="none" data-src="reels/reel-7.mp4"></video>
+          <video muted loop playsinline preload="none" data-src="course-reels/reel-7.mp4"></video>
           <div class="reel-placeholder"><div class="num">07</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
@@ -3268,32 +3268,29 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     r.addEventListener('click', () => r.classList.toggle('done'));
   });
 
-  // ===== Reels carousel · hover to play + slider arrows =====
+  // ===== Reels carousel · hover/tap to play + slider arrows =====
   document.querySelectorAll('.reel-frame').forEach(frame => {
     const v = frame.querySelector('video');
     if (!v) return;
-    // Lazily wire up data-src to actual src on first hover
+    let loaded = false;
     const ensureSrc = () => {
+      if (loaded) return;
       const src = v.dataset.src;
-      if (src && !v.src) {
-        v.src = src;
-        frame.classList.add('has-video');
-      }
+      if (!src) return;
+      v.src = src;
+      v.load();
+      frame.classList.add('has-video');
+      loaded = true;
     };
-    frame.addEventListener('mouseenter', () => {
+    const tryPlay = () => {
       ensureSrc();
-      if (v.src) v.play().catch(() => {});
-    });
-    frame.addEventListener('mouseleave', () => {
-      if (v.src) v.pause();
-    });
-    // Tap-to-toggle on mobile (no hover)
-    frame.addEventListener('click', () => {
-      ensureSrc();
-      if (!v.src) return;
-      if (v.paused) v.play().catch(() => {});
-      else v.pause();
-    });
+      const p = v.play();
+      if (p && p.catch) p.catch(err => console.warn('Reel play blocked:', err.message));
+    };
+    frame.addEventListener('mouseenter', tryPlay);
+    frame.addEventListener('mouseleave', () => { if (loaded) v.pause(); });
+    frame.addEventListener('click', (e) => { e.preventDefault(); tryPlay(); });
+    frame.addEventListener('touchstart', tryPlay, { passive: true });
   });
 
   // Slider arrows

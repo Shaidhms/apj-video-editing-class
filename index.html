@@ -2000,48 +2000,64 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
     <div class="reel-track" id="reelTrack">
       <div class="reel-card r1">
         <div class="reel-frame">
-          <video muted loop playsinline preload="metadata" data-src=""></video>
-          <div class="reel-placeholder"><div class="num">01</div><div class="label">Add reel link</div></div>
+          <video muted loop playsinline preload="none" data-src="reels/reel-1.mp4"></video>
+          <div class="reel-placeholder"><div class="num">01</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #1</b> · drop your title</div>
+        <div class="reel-caption"><b>Reel #1</b> · @ai360_with_shaid</div>
       </div>
       <div class="reel-card r2">
         <div class="reel-frame">
-          <video muted loop playsinline preload="metadata" data-src=""></video>
-          <div class="reel-placeholder"><div class="num">02</div><div class="label">Add reel link</div></div>
+          <video muted loop playsinline preload="none" data-src="reels/reel-2.mp4"></video>
+          <div class="reel-placeholder"><div class="num">02</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #2</b> · drop your title</div>
+        <div class="reel-caption"><b>Reel #2</b> · @ai360_with_shaid</div>
       </div>
       <div class="reel-card r3">
         <div class="reel-frame">
-          <video muted loop playsinline preload="metadata" data-src=""></video>
-          <div class="reel-placeholder"><div class="num">03</div><div class="label">Add reel link</div></div>
+          <video muted loop playsinline preload="none" data-src="reels/reel-3.mp4"></video>
+          <div class="reel-placeholder"><div class="num">03</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #3</b> · drop your title</div>
+        <div class="reel-caption"><b>Reel #3</b> · @ai360_with_shaid</div>
       </div>
       <div class="reel-card r4">
         <div class="reel-frame">
-          <video muted loop playsinline preload="metadata" data-src=""></video>
-          <div class="reel-placeholder"><div class="num">04</div><div class="label">Add reel link</div></div>
+          <video muted loop playsinline preload="none" data-src="reels/reel-4.mp4"></video>
+          <div class="reel-placeholder"><div class="num">04</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #4</b> · drop your title</div>
+        <div class="reel-caption"><b>Reel #4</b> · @ai360_with_shaid</div>
       </div>
       <div class="reel-card r5">
         <div class="reel-frame">
-          <video muted loop playsinline preload="metadata" data-src=""></video>
-          <div class="reel-placeholder"><div class="num">05</div><div class="label">Add reel link</div></div>
+          <video muted loop playsinline preload="none" data-src="reels/reel-5.mp4"></video>
+          <div class="reel-placeholder"><div class="num">05</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #5</b> · drop your title</div>
+        <div class="reel-caption"><b>Reel #5</b> · @ai360_with_shaid</div>
+      </div>
+      <div class="reel-card r1">
+        <div class="reel-frame">
+          <video muted loop playsinline preload="none" data-src="reels/reel-6.mp4"></video>
+          <div class="reel-placeholder"><div class="num">06</div><div class="label">hover to play</div></div>
+          <div class="reel-play"></div>
+        </div>
+        <div class="reel-caption"><b>Reel #6</b> · @ai360_with_shaid</div>
+      </div>
+      <div class="reel-card r2">
+        <div class="reel-frame">
+          <video muted loop playsinline preload="none" data-src="reels/reel-7.mp4"></video>
+          <div class="reel-placeholder"><div class="num">07</div><div class="label">hover to play</div></div>
+          <div class="reel-play"></div>
+        </div>
+        <div class="reel-caption"><b>Reel #7</b> · @ai360_with_shaid</div>
       </div>
     </div>
     <button class="reel-arrow next" aria-label="Next">›</button>
   </div>
-  <div class="reel-hint">Hover to play · click <kbd>‹</kbd> <kbd>›</kbd> to scroll</div>
+  <div class="reel-hint">Hover to play · click <kbd>‹</kbd> <kbd>›</kbd> to scroll · or tap on phone</div>
 </section>
 
 <!-- ============ 2. WORKSHOP AT A GLANCE ============ -->
@@ -3257,14 +3273,12 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
         frame.classList.add('has-video');
       }
     };
-    // Mark frames that already have a src from data-src on load
-    if (v.dataset.src) frame.classList.add('has-video');
     frame.addEventListener('mouseenter', () => {
       ensureSrc();
       if (v.src) v.play().catch(() => {});
     });
     frame.addEventListener('mouseleave', () => {
-      if (v.src) { v.pause(); v.currentTime = 0; }
+      if (v.src) v.pause();
     });
     // Tap-to-toggle on mobile (no hover)
     frame.addEventListener('click', () => {

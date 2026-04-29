@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Editing Workshop · Live Session Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:       #07090F;
+  --bg2:      #0E1120;
+  --bg3:      #141829;
+  --orange:   #FF5E1A;
+  --orange2:  #FF8C52;
+  --amber:    #FFC043;
+  --sky:      #38C9FF;
+  --violet:   #9B6DFF;
+  --mint:     #22EEA0;
+  --white:    #EEF2FF;
+  --muted:    #5A6485;
+  --sub:      #8892B0;
+  --card:     rgba(255,255,255,0.035);
+  --cborder:  rgba(255,255,255,0.07);
+  --cborder2: rgba(255,255,255,0.12);
+}
+
+html, body { width: 100%; height: 100%; background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; overflow: hidden; }
+
+/* ── PROGRESS ── */
+#prog {
+  position: fixed; top: 0; left: 0; height: 3px; z-index: 9999;
+  background: linear-gradient(90deg, var(--orange), var(--amber), var(--sky));
+  transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 0 12px rgba(255,94,26,0.6);
+  width: 0;
+}
+
+/* ── DECK ── */
+#deck { width: 100vw; height: 100vh; position: relative; }
+
+/* ── SLIDES ── */
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 52px 80px;
+  opacity: 0; transform: translateX(40px);
+  transition: opacity 0.45s cubic-bezier(.4,0,.2,1), transform 0.45s cubic-bezier(.4,0,.2,1);
+  pointer-events: none; text-align: center;
+  overflow: hidden;
+}
+.slide.active  { opacity: 1; transform: translateX(0); pointer-events: all; }
+.slide.exit    { opacity: 0; transform: translateX(-40px); }
+
+/* ── BACKGROUND BLOBS ── */
+.blob {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  filter: blur(110px); opacity: 0.12;
+}
+.blob-o { background: var(--orange); }
+.blob-s { background: var(--sky); }
+.blob-v { background: var(--violet); }
+.blob-m { background: var(--mint); }
+
+/* ── TYPE SCALE ── */
+.eyebrow {
+  font-family: 'Sora'; font-size: 11px; font-weight: 700;
+  letter-spacing: 4px; text-transform: uppercase; color: var(--orange);
+  margin-bottom: 16px; display: inline-flex; align-items: center; gap: 8px;
+}
+.eyebrow::before, .eyebrow::after { content: ''; display: block; width: 20px; height: 1px; background: currentColor; opacity: 0.5; }
+.eyebrow.s { color: var(--sky); }
+.eyebrow.v { color: var(--violet); }
+.eyebrow.m { color: var(--mint); }
+.eyebrow.a { color: var(--amber); }
+
+h1 {
+  font-family: 'Sora'; font-weight: 800;
+  font-size: clamp(38px, 5.2vw, 74px);
+  line-height: 1.06; margin-bottom: 22px; letter-spacing: -1px;
+}
+h2 {
+  font-family: 'Sora'; font-weight: 700;
+  font-size: clamp(26px, 3.6vw, 52px);
+  line-height: 1.15; margin-bottom: 18px; letter-spacing: -0.5px;
+}
+h3 {
+  font-family: 'Sora'; font-weight: 600;
+  font-size: clamp(17px, 2vw, 28px);
+  line-height: 1.3; margin-bottom: 12px;
+}
+.sub {
+  font-size: clamp(14px, 1.5vw, 19px);
+  color: var(--sub); line-height: 1.7; max-width: 720px;
+}
+
+.o { color: var(--orange); }
+.s { color: var(--sky); }
+.v { color: var(--violet); }
+.m { color: var(--mint); }
+.a { color: var(--amber); }
+b, strong { color: var(--white); }
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 18px; padding: 24px 26px;
+  text-align: left;
+}
+.card-glow-o { border-color: rgba(255,94,26,0.28); box-shadow: 0 0 0 1px rgba(255,94,26,0.08) inset; }
+.card-glow-s { border-color: rgba(56,201,255,0.28); }
+.card-glow-v { border-color: rgba(155,109,255,0.28); }
+.card-glow-m { border-color: rgba(34,238,160,0.28); }
+
+.pill {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 12px; padding: 14px 22px;
+  font-family: 'Sora'; font-weight: 500;
+  font-size: clamp(12px, 1.1vw, 15px);
+  transition: border-color 0.2s, background 0.2s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.pill:hover { border-color: var(--cborder2); background: rgba(255,255,255,0.06); }
+
+/* ── NAV ── */
+#nav {
+  position: fixed; bottom: 16px; right: 16px;
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(7,9,15,0.65);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 999px; padding: 6px 12px; z-index: 999;
+}
+#nav button {
+  background: none; border: none; color: var(--white);
+  cursor: pointer; font-size: 12px; padding: 4px 8px;
+  opacity: 0.6; transition: opacity 0.2s; border-radius: 6px;
+  font-family: 'Sora'; font-weight: 600;
+}
+#nav button:hover:not(:disabled) { opacity: 1; background: rgba(255,255,255,0.06); }
+#nav button:disabled { opacity: 0.2; cursor: default; }
+#ctr { font-family: 'Sora'; font-weight: 600; font-size: 11px; color: var(--muted); min-width: 56px; text-align: center; letter-spacing: 0.5px; }
+
+/* ── SLIDE LABEL ── */
+#slide-label {
+  position: fixed; top: 22px; right: 28px; z-index: 998;
+  font-family: 'Sora'; font-size: 11px; color: var(--muted);
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+
+/* ── BRAND CORNER ── */
+#brand {
+  position: fixed; top: 22px; left: 28px; z-index: 998;
+  font-family: 'Sora'; font-size: 11px; font-weight: 700;
+  color: var(--white); letter-spacing: 2px; text-transform: uppercase;
+  opacity: 0.4;
+}
+#brand .dot { color: var(--orange); }
+
+/* ── SECTION DIVIDER ── */
+.sec-line {
+  width: 64px; height: 4px; border-radius: 2px; margin: 18px auto 24px;
+  background: linear-gradient(90deg, var(--orange), var(--sky));
+}
+
+/* ── BIG STAT ── */
+.stat {
+  font-family: 'Sora'; font-weight: 800;
+  font-size: clamp(72px, 13vw, 160px);
+  line-height: 1;
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── STEP ── */
+.step-dot {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Sora'; font-weight: 700; font-size: 15px; color: #fff;
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+}
+.step-dot.s { background: linear-gradient(135deg, var(--sky), var(--violet)); }
+.step-dot.m { background: linear-gradient(135deg, var(--mint), var(--sky)); }
+.step-row {
+  display: flex; align-items: flex-start; gap: 18px;
+  text-align: left; width: 100%; max-width: 820px;
+  padding: 12px 0;
+}
+.step-row .step-body { padding-top: 6px; }
+.step-row .step-title { font-family: 'Sora'; font-weight: 600; font-size: clamp(15px,1.4vw,18px); margin-bottom: 4px; color: var(--white); }
+.step-row .step-desc  { font-size: clamp(13px,1.15vw,15px); color: var(--sub); line-height: 1.55; }
+.step-row .step-desc b { color: var(--white); font-weight: 600; }
+
+/* ── COVER DECORATION ── */
+.cover-rule { width: 56px; height: 4px; border-radius: 2px; margin: 20px auto 24px; background: linear-gradient(90deg, var(--orange), var(--sky)); }
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, rgba(255,94,26,0.15), rgba(56,201,255,0.08));
+  border: 1px solid rgba(255,94,26,0.3);
+  padding: 7px 20px; border-radius: 50px;
+  font-family: 'Sora'; font-size: 12px; font-weight: 600; color: var(--orange2);
+  margin-bottom: 28px; letter-spacing: 1px; text-transform: uppercase;
+}
+
+/* ── GRIDS ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; max-width: 920px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; width: 100%; max-width: 1000px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; width: 100%; max-width: 1080px; }
+
+/* ── TABLE ── */
+.ait { width: 100%; max-width: 920px; border-collapse: collapse; font-size: clamp(12px,1.1vw,15px); }
+.ait th {
+  padding: 12px 20px; text-align: left;
+  font-family: 'Sora'; font-weight: 600; font-size: 12px; letter-spacing: 1px;
+  color: var(--orange); border-bottom: 1px solid var(--cborder);
+  background: rgba(255,94,26,0.05); text-transform: uppercase;
+}
+.ait td { padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,0.035); color: var(--sub); }
+.ait tr:last-child td { border-bottom: none; }
+.ait tr:hover td { background: rgba(255,255,255,0.03); color: var(--white); }
+.ait td:first-child { color: var(--white); font-weight: 500; }
+.ait b { color: var(--white); }
+
+/* ── EXAMPLE BOX ── */
+.ex-box {
+  background: rgba(7,9,15,0.6);
+  border: 1px solid rgba(255,94,26,0.22);
+  border-radius: 14px; padding: 18px 24px;
+  text-align: left; font-size: clamp(13px,1.1vw,15px);
+  line-height: 1.65; color: var(--sub);
+  max-width: 820px; margin-top: 18px;
+}
+.ex-box .ex-label {
+  font-family: 'Sora'; font-weight: 700; font-size: 10px;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 6px; display: block;
+}
+.ex-box b { color: var(--white); font-weight: 600; }
+.ex-box .ex-quote { color: var(--amber); font-style: italic; }
+
+/* ── PRO NOTE ── */
+.pro-note {
+  margin-top: 14px; padding: 12px 18px;
+  background: rgba(255,192,67,0.06);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 8px 8px 0;
+  font-size: clamp(12.5px,1.05vw,14px);
+  color: var(--sub); text-align: left; line-height: 1.55;
+  max-width: 820px; width: 100%;
+}
+.pro-note b {
+  color: var(--amber); letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px;
+  font-family: 'Sora'; font-weight: 700; margin-right: 8px;
+}
+
+/* ── CONCEPT TWO-CARD (A-Roll vs B-Roll) ── */
+.concept-card {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 18px;
+  padding: 22px 26px;
+  text-align: left;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.concept-card.a { border-color: rgba(255,94,26,0.32); }
+.concept-card.b { border-color: rgba(56,201,255,0.32); }
+.concept-card .c-letter {
+  font-family: 'Sora'; font-weight: 800; font-size: 56px; line-height: 1;
+}
+.concept-card.a .c-letter { color: var(--orange); }
+.concept-card.b .c-letter { color: var(--sky); }
+.concept-card .c-name { font-family: 'Sora'; font-weight: 700; font-size: 22px; }
+.concept-card .c-tag {
+  font-family: 'Sora'; font-weight: 600; font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+}
+.concept-card .c-desc { font-size: 14px; color: var(--sub); line-height: 1.55; }
+.concept-card .c-desc b { color: var(--white); }
+.concept-card ul { margin-top: 6px; padding-left: 18px; font-size: 13px; color: var(--sub); }
+.concept-card ul li { margin-bottom: 4px; line-height: 1.5; }
+
+/* ── ASPECT RATIO CARDS ── */
+.ratio-card {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 14px;
+  padding: 18px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  position: relative;
+}
+.ratio-card.featured {
+  border-color: rgba(255,94,26,0.4);
+  background: linear-gradient(135deg, rgba(255,94,26,0.08), rgba(56,201,255,0.04));
+}
+.ratio-card .r-frame {
+  border: 2px solid var(--cborder2);
+  background: linear-gradient(135deg, var(--bg2), var(--bg3));
+  position: relative;
+}
+.ratio-card.featured .r-frame { border-color: var(--orange); }
+.r-frame.r-9-16 { width: 70px; height: 124px; }
+.r-frame.r-16-9 { width: 124px; height: 70px; }
+.r-frame.r-1-1  { width: 90px; height: 90px; }
+.r-frame.r-4-5  { width: 80px; height: 100px; }
+.ratio-card .r-ratio {
+  font-family: 'Sora'; font-weight: 700; font-size: 20px; color: var(--white);
+}
+.ratio-card.featured .r-ratio { color: var(--orange); }
+.ratio-card .r-name {
+  font-family: 'Sora'; font-weight: 500; font-size: 13px; color: var(--sub);
+}
+.ratio-card .r-where {
+  font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5;
+}
+.ratio-card.featured::after {
+  content: '★ YOUR PROJECT';
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  font-family: 'Sora'; font-weight: 700; font-size: 9px;
+  letter-spacing: 1.5px; color: var(--orange);
+  background: var(--bg); padding: 3px 10px;
+  border: 1px solid var(--orange); border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* ── DAY/SECTION DIVIDER ── */
+.section-hero {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  text-align: center;
+}
+.section-hero .sec-num {
+  font-family: 'Sora'; font-weight: 800;
+  font-size: clamp(120px, 18vw, 220px); line-height: 0.9;
+  background: linear-gradient(135deg, var(--orange), var(--violet));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* ── LESSON CARD GRID (overview) ── */
+.lesson-grid-card {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 16px;
+  padding: 20px 22px;
+  text-align: left;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.lesson-grid-card:hover { border-color: var(--cborder2); transform: translateY(-2px); }
+.lesson-grid-card .lg-num {
+  font-family: 'Sora'; font-weight: 800; font-size: 24px; line-height: 1;
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.lesson-grid-card .lg-name {
+  font-family: 'Sora'; font-weight: 600; font-size: 17px; margin-bottom: 6px;
+}
+.lesson-grid-card .lg-desc { font-size: 13.5px; color: var(--sub); line-height: 1.55; }
+
+/* ── FINAL PROJECT CARD ── */
+.final-card {
+  background: linear-gradient(135deg, rgba(255,94,26,0.08), rgba(155,109,255,0.05));
+  border: 1px solid rgba(255,94,26,0.3);
+  border-radius: 22px;
+  padding: 32px 38px;
+  max-width: 720px; width: 100%;
+  text-align: left;
+}
+.final-card .f-quote {
+  font-family: 'Sora'; font-weight: 700; font-size: clamp(28px, 3.4vw, 44px);
+  line-height: 1.1; letter-spacing: -0.5px; margin-bottom: 18px;
+}
+.final-card .f-quote em { color: var(--orange); font-style: italic; }
+.final-card .f-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  margin-top: 18px; padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.final-card .f-stat .k {
+  font-family: 'Sora'; font-weight: 600; font-size: 10px;
+  letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.final-card .f-stat .v {
+  font-family: 'Sora'; font-weight: 700; font-size: 17px; color: var(--white);
+}
+
+/* ── CHECKLIST ── */
+.checklist {
+  display: flex; flex-direction: column; gap: 4px;
+  width: 100%; max-width: 720px; text-align: left;
+}
+.check-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 14px;
+  background: var(--card); border: 1px solid var(--cborder);
+  border-radius: 8px; cursor: pointer; transition: all 0.18s;
+}
+.check-row:hover { border-color: var(--cborder2); }
+.check-row .ch-box {
+  width: 18px; height: 18px; flex-shrink: 0;
+  border: 1.5px solid var(--muted);
+  border-radius: 4px; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.check-row.done .ch-box {
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  border-color: var(--orange);
+}
+.check-row.done .ch-box::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; }
+.check-row .ch-text { font-size: 14px; color: var(--white); line-height: 1.5; font-family: 'DM Sans'; }
+.check-row.done .ch-text { color: var(--muted); text-decoration: line-through; }
+
+/* ── EDITOR'S CODE GRID ── */
+.code-rule {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 14px;
+  padding: 18px 20px;
+  text-align: left;
+  transition: border-color 0.2s;
+}
+.code-rule:hover { border-color: rgba(255,192,67,0.4); }
+.code-rule .cr-num {
+  font-family: 'Sora'; font-weight: 800; font-size: 13px;
+  letter-spacing: 1.5px; color: var(--amber); margin-bottom: 6px;
+}
+.code-rule .cr-title {
+  font-family: 'Sora'; font-weight: 600; font-size: 16px; margin-bottom: 6px; line-height: 1.2;
+}
+.code-rule .cr-desc { font-size: 13px; color: var(--sub); line-height: 1.55; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes blobFloat {
+  from { transform: scale(1) translate(0,0); }
+  to   { transform: scale(1.12) translate(12px, -12px); }
+}
+
+.slide.active .eyebrow   { animation: fadeUp 0.5s cubic-bezier(.4,0,.2,1) 0.05s both; }
+.slide.active .badge     { animation: scaleIn 0.5s cubic-bezier(.4,0,.2,1) 0.05s both; }
+.slide.active h1         { animation: fadeUp 0.55s cubic-bezier(.4,0,.2,1) 0.12s both; }
+.slide.active h2         { animation: fadeUp 0.55s cubic-bezier(.4,0,.2,1) 0.10s both; }
+.slide.active .sub       { animation: fadeUp 0.55s cubic-bezier(.4,0,.2,1) 0.22s both; }
+.slide.active .cover-rule, .slide.active .sec-line { animation: scaleIn 0.5s ease 0.3s both; }
+.slide.active .stat      { animation: countUp 0.65s cubic-bezier(.2,1.4,.4,1) 0.18s both; }
+.slide.active .section-hero .sec-num { animation: countUp 0.65s cubic-bezier(.2,1.4,.4,1) 0.18s both; }
+
+.slide.active .card:nth-child(1) { animation: fadeUp 0.5s ease 0.20s both; }
+.slide.active .card:nth-child(2) { animation: fadeUp 0.5s ease 0.30s both; }
+.slide.active .card:nth-child(3) { animation: fadeUp 0.5s ease 0.40s both; }
+.slide.active .card:nth-child(4) { animation: fadeUp 0.5s ease 0.50s both; }
+
+.slide.active .step-row:nth-child(1) { animation: slideLeft 0.45s ease 0.18s both; }
+.slide.active .step-row:nth-child(2) { animation: slideLeft 0.45s ease 0.30s both; }
+.slide.active .step-row:nth-child(3) { animation: slideLeft 0.45s ease 0.42s both; }
+.slide.active .step-row:nth-child(4) { animation: slideLeft 0.45s ease 0.54s both; }
+.slide.active .step-row:nth-child(5) { animation: slideLeft 0.45s ease 0.66s both; }
+.slide.active .step-row:nth-child(6) { animation: slideLeft 0.45s ease 0.78s both; }
+
+.slide.active .lesson-grid-card:nth-child(1) { animation: fadeUp 0.45s ease 0.18s both; }
+.slide.active .lesson-grid-card:nth-child(2) { animation: fadeUp 0.45s ease 0.26s both; }
+.slide.active .lesson-grid-card:nth-child(3) { animation: fadeUp 0.45s ease 0.34s both; }
+.slide.active .lesson-grid-card:nth-child(4) { animation: fadeUp 0.45s ease 0.42s both; }
+.slide.active .lesson-grid-card:nth-child(5) { animation: fadeUp 0.45s ease 0.50s both; }
+.slide.active .lesson-grid-card:nth-child(6) { animation: fadeUp 0.45s ease 0.58s both; }
+
+.slide.active .ratio-card:nth-child(1) { animation: scaleIn 0.5s ease 0.18s both; }
+.slide.active .ratio-card:nth-child(2) { animation: scaleIn 0.5s ease 0.28s both; }
+.slide.active .ratio-card:nth-child(3) { animation: scaleIn 0.5s ease 0.38s both; }
+.slide.active .ratio-card:nth-child(4) { animation: scaleIn 0.5s ease 0.48s both; }
+
+.slide.active .code-rule:nth-child(1) { animation: fadeUp 0.45s ease 0.15s both; }
+.slide.active .code-rule:nth-child(2) { animation: fadeUp 0.45s ease 0.22s both; }
+.slide.active .code-rule:nth-child(3) { animation: fadeUp 0.45s ease 0.29s both; }
+.slide.active .code-rule:nth-child(4) { animation: fadeUp 0.45s ease 0.36s both; }
+.slide.active .code-rule:nth-child(5) { animation: fadeUp 0.45s ease 0.43s both; }
+.slide.active .code-rule:nth-child(6) { animation: fadeUp 0.45s ease 0.50s both; }
+
+.slide.active .check-row:nth-child(1) { animation: slideLeft 0.4s ease 0.10s both; }
+.slide.active .check-row:nth-child(2) { animation: slideLeft 0.4s ease 0.16s both; }
+.slide.active .check-row:nth-child(3) { animation: slideLeft 0.4s ease 0.22s both; }
+.slide.active .check-row:nth-child(4) { animation: slideLeft 0.4s ease 0.28s both; }
+.slide.active .check-row:nth-child(5) { animation: slideLeft 0.4s ease 0.34s both; }
+.slide.active .check-row:nth-child(6) { animation: slideLeft 0.4s ease 0.40s both; }
+.slide.active .check-row:nth-child(7) { animation: slideLeft 0.4s ease 0.46s both; }
+.slide.active .check-row:nth-child(8) { animation: slideLeft 0.4s ease 0.52s both; }
+
+.slide.active .ait tbody tr:nth-child(1) { animation: fadeUp 0.4s ease 0.18s both; }
+.slide.active .ait tbody tr:nth-child(2) { animation: fadeUp 0.4s ease 0.26s both; }
+.slide.active .ait tbody tr:nth-child(3) { animation: fadeUp 0.4s ease 0.34s both; }
+.slide.active .ait tbody tr:nth-child(4) { animation: fadeUp 0.4s ease 0.42s both; }
+.slide.active .ait tbody tr:nth-child(5) { animation: fadeUp 0.4s ease 0.50s both; }
+.slide.active .ait tbody tr:nth-child(6) { animation: fadeUp 0.4s ease 0.58s both; }
+.slide.active .ait tbody tr:nth-child(7) { animation: fadeUp 0.4s ease 0.66s both; }
+
+.slide.active .ex-box, .slide.active .pro-note { animation: fadeUp 0.5s ease 0.55s both; }
+.slide.active .concept-card:nth-child(1) { animation: fadeUp 0.5s ease 0.20s both; }
+.slide.active .concept-card:nth-child(2) { animation: fadeUp 0.5s ease 0.32s both; }
+.slide.active .final-card { animation: fadeUp 0.55s ease 0.20s both; }
+
+.blob { animation: blobFloat 8s ease-in-out infinite alternate; }
+
+/* ════════════════════════════════════
+   STEP-UP CASCADE · the main motion
+═══════════════════════════════════════ */
+@keyframes stepUp {
+  0%   { opacity: 0; transform: translateY(36px) scale(0.94); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes logoEntrance {
+  0%   { opacity: 0; transform: scale(0.4) rotate(-8deg); }
+  60%  { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes ruleGrow {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+
+/* ── Cover slide cascade ── */
+.slide.active .cover-logo  { animation: logoEntrance 1s cubic-bezier(.2,1.3,.4,1) 0.05s both; }
+.slide.active .badge       { animation: stepUp 0.55s cubic-bezier(.2,1.3,.4,1) 0.45s both; }
+.slide.active .cover-rule  { animation: ruleGrow 0.6s cubic-bezier(.2,1,.4,1) 0.85s both; transform-origin: center; }
+.slide.active .cover-stat-row .cover-stat-item:nth-child(1) { animation: stepUp 0.5s cubic-bezier(.2,1.3,.4,1) 1.10s both; }
+.slide.active .cover-stat-row .cover-stat-item:nth-child(2) { animation: stepUp 0.5s cubic-bezier(.2,1.3,.4,1) 1.20s both; }
+.slide.active .cover-stat-row .cover-stat-item:nth-child(3) { animation: stepUp 0.5s cubic-bezier(.2,1.3,.4,1) 1.30s both; }
+
+/* ── Vocabulary cells ── */
+.slide.active .vocab-cell:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.20s both; }
+.slide.active .vocab-cell:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.32s both; }
+.slide.active .vocab-cell:nth-child(3) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.44s both; }
+
+/* ── Why-this-skill cards + stats ── */
+.slide.active .why-card:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.28s both; }
+.slide.active .why-card:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.40s both; }
+.slide.active .why-card:nth-child(3) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.52s both; }
+.slide.active .why-stat:nth-child(1) { animation: stepUp 0.5s cubic-bezier(.2,1.4,.4,1) 0.70s both; }
+.slide.active .why-stat:nth-child(2) { animation: stepUp 0.5s cubic-bezier(.2,1.4,.4,1) 0.82s both; }
+.slide.active .why-stat:nth-child(3) { animation: stepUp 0.5s cubic-bezier(.2,1.4,.4,1) 0.94s both; }
+
+/* ── Tool link cards ── */
+.slide.active .tool-link-card:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.22s both; }
+.slide.active .tool-link-card:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.34s both; }
+.slide.active .tool-link-card:nth-child(3) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.46s both; }
+
+/* ── VPN cards ── */
+.slide.active .vpn-card:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.22s both; }
+.slide.active .vpn-card:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.34s both; }
+.slide.active .vpn-card:nth-child(3) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.46s both; }
+
+/* ── Compact step rows (lesson slides) ── */
+.slide.active .cstep-row:nth-child(1) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
+.slide.active .cstep-row:nth-child(2) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.42s both; }
+.slide.active .cstep-row:nth-child(3) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.54s both; }
+.slide.active .cstep-row:nth-child(4) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.66s both; }
+.slide.active .cstep-row:nth-child(5) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.78s both; }
+
+/* ── A-Roll / B-Roll concept cards ── */
+.slide.active .ab-def.a, .slide.active .concept-card.a { animation: slideLeft 0.55s cubic-bezier(.2,1,.4,1) 0.25s both; }
+.slide.active .ab-def.b, .slide.active .concept-card.b { animation: slideRight 0.55s cubic-bezier(.2,1,.4,1) 0.35s both; }
+
+/* ── AI tool cards (Google Flow / Meta AI) ── */
+.slide.active .ai-card:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.25s both; }
+.slide.active .ai-card:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.2,.4,1) 0.40s both; }
+.slide.active .prompt-box:nth-child(1) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
+.slide.active .prompt-box:nth-child(2) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.42s both; }
+.slide.active .prompt-box:nth-child(3) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.54s both; }
+
+/* ── Aspect ratio cards (override) ── */
+.slide.active .ratio-card:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.20s both; }
+.slide.active .ratio-card:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.32s both; }
+.slide.active .ratio-card:nth-child(3) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.44s both; }
+.slide.active .ratio-card:nth-child(4) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.56s both; }
+
+/* ── Schedule rows ── */
+.slide.active .schedule-row:nth-child(1) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.18s both; }
+.slide.active .schedule-row:nth-child(2) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.26s both; }
+.slide.active .schedule-row:nth-child(3) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.34s both; }
+.slide.active .schedule-row:nth-child(4) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.42s both; }
+.slide.active .schedule-row:nth-child(5) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.50s both; }
+.slide.active .schedule-row:nth-child(6) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.58s both; }
+.slide.active .schedule-row:nth-child(7) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.66s both; }
+
+/* ── Brand marks pulse (tool slide) ── */
+.slide.active .brand-mark { animation: scaleIn 0.5s cubic-bezier(.2,1.4,.4,1) 0.30s both; }
+
+/* ── Compact callout (after steps) ── */
+.slide.active .compact-callout { animation: stepUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.85s both; }
+.slide.active .pro-note { animation: stepUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.85s both; }
+
+/* ── Devices row in aspect ratio slide ── */
+.slide.active .device:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.20s both; }
+.slide.active .device:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.32s both; }
+.slide.active .device:nth-child(3) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.44s both; }
+.slide.active .device:nth-child(4) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.56s both; }
+
+/* ── Day TOC rows (in dividers) ── */
+.slide.active .day-toc-row:nth-child(1) { animation: slideLeft 0.45s ease 0.30s both; }
+.slide.active .day-toc-row:nth-child(2) { animation: slideLeft 0.45s ease 0.40s both; }
+.slide.active .day-toc-row:nth-child(3) { animation: slideLeft 0.45s ease 0.50s both; }
+.slide.active .day-toc-row:nth-child(4) { animation: slideLeft 0.45s ease 0.60s both; }
+
+/* ── KF property tiles ── */
+.slide.active .kf-prop:nth-child(1) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.40s both; }
+.slide.active .kf-prop:nth-child(2) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.50s both; }
+.slide.active .kf-prop:nth-child(3) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.60s both; }
+
+/* ── Trans cards (transitions) ── */
+.slide.active .trans-card:nth-child(1) { animation: stepUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.25s both; }
+.slide.active .trans-card:nth-child(2) { animation: stepUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.37s both; }
+.slide.active .trans-card:nth-child(3) { animation: stepUp 0.5s cubic-bezier(.2,1.2,.4,1) 0.49s both; }
+
+/* ── Specs cells (homework) ── */
+.slide.active .spec-cell:nth-child(1) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.20s both; }
+.slide.active .spec-cell:nth-child(2) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.30s both; }
+.slide.active .spec-cell:nth-child(3) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.40s both; }
+.slide.active .spec-cell:nth-child(4) { animation: stepUp 0.45s cubic-bezier(.2,1.2,.4,1) 0.50s both; }
+
+/* ── Final card + brief stats ── */
+.slide.active .final-card { animation: stepUp 0.6s cubic-bezier(.2,1.3,.4,1) 0.20s both; }
+.slide.active .f-stat:nth-child(1) { animation: stepUp 0.4s ease 0.55s both; }
+.slide.active .f-stat:nth-child(2) { animation: stepUp 0.4s ease 0.65s both; }
+.slide.active .f-stat:nth-child(3) { animation: stepUp 0.4s ease 0.75s both; }
+
+/* ── BRAND MARKS ── */
+.brand-mark {
+  width: 56px; height: 56px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Sora'; font-weight: 800; font-size: 26px;
+  position: relative; flex-shrink: 0;
+}
+.bm-capcut { background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+.bm-capcut::after {
+  content: ''; position: absolute; top: 8px; right: 8px;
+  width: 9px; height: 9px;
+  background: linear-gradient(135deg, #00BFA6, #4ECDC4);
+  border-radius: 50%;
+}
+.bm-luma { background: linear-gradient(135deg, #16213e, #0a0e1a); color: #FF6B35; border: 1px solid rgba(255,107,53,0.4); }
+.bm-clipchamp { background: linear-gradient(135deg, #2563EB, #7C3AED); color: #fff; }
+
+/* ── TOOL LINK CARDS ── */
+.tool-link-card {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 18px; padding: 22px 24px;
+  text-align: left; display: flex; flex-direction: column; gap: 4px;
+  height: 100%;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.tool-link-card:hover { border-color: var(--cborder2); transform: translateY(-2px); }
+.tool-link-card.featured {
+  border-color: rgba(255,94,26,0.32);
+  background: linear-gradient(135deg, rgba(255,94,26,0.08), rgba(255,140,82,0.02));
+}
+.tool-link-card .tl-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.tool-link-card .tl-name { font-family: 'Sora'; font-weight: 700; font-size: 22px; line-height: 1.1; }
+.tool-link-card .tl-pick {
+  display: inline-block;
+  font-family: 'Sora'; font-size: 9px; font-weight: 700;
+  letter-spacing: 1.5px; color: var(--orange);
+  padding: 3px 8px; border: 1px solid var(--orange);
+  border-radius: 4px; margin-top: 4px; width: fit-content;
+}
+.tool-link-card .tl-meta {
+  font-family: 'Sora'; font-size: 10px; color: var(--muted);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;
+}
+.tool-link-card .tl-desc { font-size: 13.5px; color: var(--sub); line-height: 1.55; flex: 1; }
+.tool-link-card .tl-link {
+  font-family: 'Sora'; font-size: 11px; color: var(--orange2);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--cborder);
+  word-break: break-all; font-weight: 500;
+}
+.tool-link-card .tl-link:hover { color: var(--amber); }
+
+/* ── VPN CARDS ── */
+.vpn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 920px; margin-top: 20px; }
+.vpn-card {
+  background: var(--card); border: 1px solid var(--cborder);
+  border-radius: 14px; padding: 16px 18px; text-align: left;
+}
+.vpn-card.recommended {
+  border-color: rgba(34,238,160,0.32);
+  background: linear-gradient(135deg, rgba(34,238,160,0.05), transparent);
+}
+.vpn-card .vc-tag {
+  font-family: 'Sora'; font-size: 9px; color: var(--mint);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; font-weight: 700;
+}
+.vpn-card .vc-name { font-family: 'Sora'; font-weight: 700; font-size: 16px; }
+.vpn-card .vc-desc { font-size: 12.5px; color: var(--sub); line-height: 1.5; margin-top: 6px; }
+.vpn-card .vc-link {
+  font-family: 'Sora'; font-size: 10px; color: var(--mint);
+  word-break: break-all; margin-top: 8px;
+  padding-top: 8px; border-top: 1px solid var(--cborder);
+  display: block; text-decoration: none;
+}
+
+/* ── ANIMATED CUT TIMELINE ── */
+.tl-anim {
+  width: 100%; max-width: 720px;
+  background: rgba(7,9,15,0.7);
+  border: 1px solid var(--cborder);
+  border-radius: 14px;
+  padding: 24px 28px 22px;
+  margin-top: 22px;
+}
+.tl-anim-label {
+  font-family: 'Sora'; font-weight: 600; font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 18px; text-align: left;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.tl-anim-label .live { display: inline-flex; align-items: center; gap: 6px; color: var(--orange); }
+.tl-anim-label .live::before { content: ''; width: 6px; height: 6px; background: var(--orange); border-radius: 50%; animation: pulse-dot 1.4s infinite; }
+@keyframes pulse-dot { 50% { opacity: 0.3; } }
+
+.cut-strip { position: relative; height: 44px; background: rgba(255,255,255,0.04); border-radius: 6px; }
+.cut-strip .ghost {
+  position: absolute; top: 2px; bottom: 2px;
+  background: repeating-linear-gradient(45deg, rgba(255,94,26,0.18) 0, rgba(255,94,26,0.18) 6px, transparent 6px, transparent 12px);
+  border: 1px dashed rgba(255,94,26,0.4);
+  border-radius: 4px; width: 0;
+}
+.cut-strip .ghost.l { left: 0; animation: cut-ghost-l 5s ease-in-out infinite; }
+.cut-strip .ghost.r { right: 0; animation: cut-ghost-r 5s ease-in-out infinite; }
+@keyframes cut-ghost-l { 0%, 12% { width: 0; opacity: 0; } 30%, 70% { width: 18%; opacity: 1; } 88%, 100% { width: 0; opacity: 0; } }
+@keyframes cut-ghost-r { 0%, 12% { width: 0; opacity: 0; } 30%, 70% { width: 14%; opacity: 1; } 88%, 100% { width: 0; opacity: 0; } }
+
+.cut-strip .clip {
+  position: absolute; top: 2px; bottom: 2px;
+  background: linear-gradient(90deg, var(--orange), var(--amber));
+  border-radius: 4px;
+  display: flex; align-items: center; padding: 0 14px;
+  font-family: 'Sora'; font-weight: 600; font-size: 11px; color: #fff;
+  letter-spacing: 0.5px;
+  left: 0; right: 0;
+  animation: cut-clip 5s ease-in-out infinite;
+}
+@keyframes cut-clip { 0%, 12% { left: 0%; right: 0%; } 30%, 70% { left: 18%; right: 14%; } 88%, 100% { left: 0%; right: 0%; } }
+
+.cut-strip .handle {
+  position: absolute; top: -4px; bottom: -4px; width: 4px;
+  background: #fff; border-radius: 2px; z-index: 4;
+  box-shadow: 0 0 6px rgba(255,255,255,0.4);
+}
+.cut-strip .handle.l { left: 0; animation: cut-handle-l 5s ease-in-out infinite; }
+.cut-strip .handle.r { right: 0; animation: cut-handle-r 5s ease-in-out infinite; }
+@keyframes cut-handle-l { 0%, 12% { left: 0%; } 30%, 70% { left: 18%; } 88%, 100% { left: 0%; } }
+@keyframes cut-handle-r { 0%, 12% { right: 0%; } 30%, 70% { right: 14%; } 88%, 100% { right: 0%; } }
+
+.tl-meta-row {
+  display: flex; justify-content: space-between; margin-top: 16px;
+  font-family: 'Sora'; font-size: 10px; color: var(--muted);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.tl-meta-row .out { color: var(--orange); }
+
+/* ── ANIMATED SPLIT TIMELINE ── */
+.split-strip { position: relative; height: 44px; background: rgba(255,255,255,0.04); border-radius: 6px; }
+.split-strip .clip-a, .split-strip .clip-b {
+  position: absolute; top: 2px; bottom: 2px;
+  border-radius: 4px;
+  display: flex; align-items: center; padding: 0 14px;
+  font-family: 'Sora'; font-weight: 600; font-size: 11px; color: #fff;
+  letter-spacing: 0.5px;
+}
+.split-strip .clip-a { left: 0; background: linear-gradient(90deg, var(--sky), #1a4a5c); animation: split-a 5s ease-in-out infinite; }
+.split-strip .clip-b { right: 0; background: linear-gradient(90deg, #5a3a8c, var(--violet)); animation: split-b 5s ease-in-out infinite; }
+@keyframes split-a { 0%, 35% { right: 0%; } 55%, 80% { right: 50.6%; } 95%, 100% { right: 0%; } }
+@keyframes split-b { 0%, 35% { left: 0%; } 55%, 80% { left: 50.6%; } 95%, 100% { left: 0%; } }
+
+.split-strip .ph {
+  position: absolute; top: -8px; bottom: -8px;
+  left: 50%; transform: translateX(-50%);
+  width: 2px; background: var(--orange);
+  box-shadow: 0 0 10px rgba(255,94,26,0.7);
+  z-index: 5; opacity: 0;
+  animation: split-ph 5s ease-in-out infinite;
+}
+@keyframes split-ph { 0%, 15% { opacity: 0; } 25%, 50% { opacity: 1; } 60%, 100% { opacity: 0; } }
+.split-strip .ph-icon {
+  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+  font-family: 'Sora'; font-size: 14px; color: var(--orange);
+  opacity: 0; animation: split-icon 5s ease-in-out infinite;
+}
+@keyframes split-icon { 0%, 20% { opacity: 0; transform: translateX(-50%) scale(0.5); } 35%, 55% { opacity: 1; transform: translateX(-50%) scale(1.2); } 70%, 100% { opacity: 0; } }
+
+/* ── A-ROLL / B-ROLL ANIMATION ── */
+.ab-anim {
+  display: grid; grid-template-columns: 220px 1fr; gap: 22px;
+  width: 100%; max-width: 880px;
+  background: rgba(7,9,15,0.7);
+  border: 1px solid var(--cborder);
+  border-radius: 14px;
+  padding: 22px;
+  margin-top: 18px;
+  align-items: stretch;
+}
+.ab-vp {
+  aspect-ratio: 16/9;
+  border: 1px solid var(--cborder);
+  border-radius: 8px;
+  position: relative; overflow: hidden;
+  background: var(--bg);
+}
+.ab-vp-frame {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'Sora'; font-weight: 600; color: #fff;
+  text-align: center; padding: 12px; gap: 4px;
+  opacity: 0;
+}
+.ab-vp-frame .vp-tag {
+  font-family: 'Sora'; font-size: 9px; letter-spacing: 1.5px;
+  text-transform: uppercase; opacity: 0.85; font-weight: 700;
+}
+.ab-vp-frame .vp-content { font-family: 'Sora'; font-size: 13px; line-height: 1.3; font-weight: 600; }
+.vp-a  { background: linear-gradient(135deg, #FF8C52, #B83A28 70%, #5C1F12); }
+.vp-b1 { background: linear-gradient(180deg, #FFC043, #FF5E1A 60%, #2C1004); }
+.vp-b2 { background: linear-gradient(135deg, #4A2A1E, #1A0E08); }
+.vp-b3 { background: linear-gradient(135deg, #235260, #0E1A1F); }
+.vp-a   { animation: vp-a 12s linear infinite; }
+.vp-b1  { animation: vp-b1 12s linear infinite; }
+.vp-b2  { animation: vp-b2 12s linear infinite; }
+.vp-b3  { animation: vp-b3 12s linear infinite; }
+@keyframes vp-a {
+  0%, 14% { opacity: 1; } 16%, 36% { opacity: 0; }
+  38%, 52% { opacity: 1; } 54%, 72% { opacity: 0; }
+  74%, 86% { opacity: 1; } 88%, 100% { opacity: 0; }
+}
+@keyframes vp-b1 { 0%, 15% { opacity: 0; } 17%, 35% { opacity: 1; } 37%, 100% { opacity: 0; } }
+@keyframes vp-b2 { 0%, 53% { opacity: 0; } 55%, 71% { opacity: 1; } 73%, 100% { opacity: 0; } }
+@keyframes vp-b3 { 0%, 87% { opacity: 0; } 89%, 100% { opacity: 1; } }
+
+.ab-tracks { display: flex; flex-direction: column; gap: 8px; position: relative; padding: 6px 0; align-self: center; }
+.ab-track { display: grid; grid-template-columns: 60px 1fr; gap: 12px; align-items: center; }
+.ab-tlbl { font-family: 'Sora'; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
+.ab-strip { position: relative; height: 28px; background: rgba(255,255,255,0.03); border-radius: 4px; }
+.ab-clip {
+  position: absolute; top: 2px; bottom: 2px;
+  border-radius: 3px;
+  display: flex; align-items: center; padding: 0 10px;
+  font-family: 'Sora'; font-weight: 600; font-size: 9px; color: #fff;
+  letter-spacing: 0.8px;
+}
+.ab-clip-a  { left: 0; right: 0; background: linear-gradient(90deg, #FF8C52, #B83A28); }
+.ab-clip-b1 { left: 16%; width: 22%; background: linear-gradient(90deg, #FFC043, #FF8C52); color: #2C1004; }
+.ab-clip-b2 { left: 53%; width: 18%; background: linear-gradient(90deg, #38C9FF, #235260); }
+.ab-clip-b3 { left: 86%; width: 13%; background: linear-gradient(90deg, #9B6DFF, #5C3A8C); }
+
+.ab-ph-overlay { position: absolute; left: 72px; right: 0; top: 6px; bottom: 6px; pointer-events: none; }
+.ab-ph {
+  position: absolute; top: 0; bottom: 0;
+  width: 2px; background: #fff;
+  box-shadow: 0 0 8px rgba(255,255,255,0.6);
+  animation: ab-ph 12s linear infinite;
+}
+.ab-ph::before { content: ''; position: absolute; top: -3px; left: -3px; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
+@keyframes ab-ph { from { left: 0%; } to { left: 100%; } }
+
+/* ── ASPECT RATIO IMPROVED FRAMES ── */
+.r-9-16 { width: 78px; height: 138px; }
+.r-16-9 { width: 138px; height: 78px; }
+.r-1-1  { width: 100px; height: 100px; }
+.r-4-5  { width: 92px; height: 115px; }
+
+.r-reels { position: absolute; inset: 0; background: linear-gradient(180deg, #FF8C52 0%, #B83A28 60%, #2C1004 100%); }
+.r-reels .play-btn {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 0; height: 0; border-left: 12px solid rgba(255,255,255,0.85);
+  border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+}
+.r-reels .actions {
+  position: absolute; right: 4px; bottom: 16px;
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 8px; color: rgba(255,255,255,0.9);
+}
+.r-reels .caption {
+  position: absolute; left: 4px; bottom: 4px;
+  font-family: 'Sora'; font-size: 6px; color: rgba(255,255,255,0.85); font-weight: 600;
+}
+
+.r-cinema { position: absolute; inset: 0; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%); }
+.r-cinema::before, .r-cinema::after { content: ''; position: absolute; left: 0; right: 0; height: 12%; background: #000; }
+.r-cinema::before { top: 0; }
+.r-cinema::after { bottom: 0; }
+.r-cinema .play-btn {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 0; height: 0; border-left: 14px solid rgba(255,255,255,0.7);
+  border-top: 9px solid transparent; border-bottom: 9px solid transparent;
+}
+.r-cinema .progress { position: absolute; left: 8px; right: 8px; bottom: 16%; height: 2px; background: rgba(255,255,255,0.2); border-radius: 1px; }
+.r-cinema .progress::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 35%; background: var(--orange); border-radius: 1px; }
+
+.r-square { position: absolute; inset: 0; background: linear-gradient(135deg, #FFC043 0%, #FF8C52 60%, #5C1F12 100%); }
+.r-square .grid-pat { position: absolute; inset: 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; opacity: 0.4; }
+.r-square .grid-pat .cell { background: rgba(255,255,255,0.25); border-radius: 2px; }
+
+.r-feed { position: absolute; inset: 0; background: linear-gradient(180deg, #5C3A8C 0%, #38C9FF 60%, #1a3540 100%); }
+.r-feed .ig-actions { position: absolute; left: 4px; bottom: 3px; font-size: 8px; color: rgba(255,255,255,0.9); display: flex; gap: 4px; }
+
+/* ── KEYFRAME ANIMATION ── */
+.kf-anim {
+  width: 100%; max-width: 720px;
+  background: rgba(7,9,15,0.7);
+  border: 1px solid var(--cborder);
+  border-radius: 14px;
+  padding: 28px 32px 22px;
+  margin-top: 22px;
+}
+.kf-stage { position: relative; height: 70px; background: rgba(255,255,255,0.04); border-radius: 6px; margin: 18px 0 6px; }
+.kf-track { position: absolute; top: 50%; transform: translateY(-50%); left: 8%; right: 8%; height: 2px; background: rgba(255,94,26,0.3); }
+.kf-marker {
+  position: absolute; top: 50%;
+  width: 14px; height: 14px; margin: -7px 0 0 -7px;
+  background: var(--orange); border: 2px solid #fff;
+  transform: rotate(45deg); z-index: 2;
+}
+.kf-marker.start { left: 8%; }
+.kf-marker.end { left: 92%; }
+.kf-marker-label {
+  position: absolute; top: 4px;
+  font-family: 'Sora'; font-size: 9px; color: var(--orange);
+  letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;
+  white-space: nowrap;
+}
+.kf-marker-label.start { left: 4%; }
+.kf-marker-label.end { right: 4%; }
+.kf-object {
+  position: absolute; top: 50%;
+  width: 28px; height: 28px; margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  box-shadow: 0 0 18px rgba(255,94,26,0.5);
+  animation: kf-move 4s ease-in-out infinite alternate;
+}
+@keyframes kf-move {
+  0%   { left: 8%;  transform: scale(0.5); opacity: 0.4; }
+  100% { left: 92%; transform: scale(1.4); opacity: 1; }
+}
+.kf-props { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.kf-prop { text-align: left; padding: 9px 12px; background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 2px solid var(--orange); }
+.kf-prop .k { font-family: 'Sora'; font-size: 9px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 2px; font-weight: 600; }
+.kf-prop .v { font-family: 'Sora'; font-size: 12.5px; color: var(--white); font-weight: 600; }
+.kf-prop .v .arrow { color: var(--orange); margin: 0 4px; }
+
+/* ── AI TOOL CARDS ── */
+.ai-card {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 18px;
+  padding: 22px 24px;
+  text-align: left;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.ai-card.flow { border-color: rgba(56,201,255,0.32); background: linear-gradient(135deg, rgba(56,201,255,0.06), transparent); }
+.ai-card.meta { border-color: rgba(155,109,255,0.32); background: linear-gradient(135deg, rgba(155,109,255,0.06), transparent); }
+.ai-card .ai-tag { font-family: 'Sora'; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.ai-card .ai-name { font-family: 'Sora'; font-weight: 700; font-size: 22px; }
+.ai-card .ai-desc { font-size: 13.5px; color: var(--sub); line-height: 1.55; }
+.ai-card .ai-link {
+  font-family: 'Sora'; font-size: 11px; color: var(--sky);
+  text-decoration: none; word-break: break-all; margin-top: 6px;
+  padding-top: 8px; border-top: 1px solid var(--cborder);
+}
+.ai-card.meta .ai-link { color: var(--violet); }
+
+/* ── PROMPT BOX (for Google Flow examples) ── */
+.prompt-box {
+  background: rgba(7,9,15,0.85);
+  border: 1px solid rgba(56,201,255,0.25);
+  border-radius: 10px; padding: 14px 18px;
+  text-align: left; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; line-height: 1.6;
+  color: var(--white);
+  font-style: italic;
+}
+.prompt-box .pb-label {
+  font-family: 'Sora'; font-style: normal; font-size: 9px;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--sky);
+  margin-bottom: 6px; font-weight: 700;
+}
+
+/* ── SUBTITLE PREVIEW ── */
+.subtitle-preview {
+  position: relative;
+  width: 100%; max-width: 320px;
+  aspect-ratio: 9/16;
+  background: linear-gradient(180deg, #2a1a14 0%, #1a0e08 70%, #0a0604);
+  border-radius: 14px;
+  border: 2px solid var(--cborder2);
+  overflow: hidden;
+  margin: 0 auto;
+}
+.subtitle-preview .frame-content {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 60%; aspect-ratio: 1;
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.subtitle-line {
+  position: absolute; left: 8%; right: 8%;
+  text-align: center;
+  font-family: 'Sora'; font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.6);
+  font-size: 17px;
+  line-height: 1.2;
+  bottom: 22%;
+}
+.subtitle-line .accent { color: var(--orange); }
+
+/* ── NAV MENU PANEL (M key toggle) ── */
+#nav-menu {
+  position: fixed; top: 0; right: 0; height: 100vh;
+  width: clamp(280px, 30vw, 400px);
+  background: rgba(14,17,32,0.96);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-left: 1px solid rgba(255,255,255,0.08);
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+  z-index: 1000;
+  display: flex; flex-direction: column;
+  box-shadow: -20px 0 60px rgba(0,0,0,0.4);
+}
+#nav-menu.open { transform: translateX(0); }
+
+#nav-menu-header {
+  padding: 22px 24px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+#nav-menu-header h3 {
+  font-family: 'Sora'; font-weight: 700; font-size: 12px;
+  letter-spacing: 2.5px; text-transform: uppercase; color: var(--orange);
+  margin-bottom: 6px;
+}
+#nav-menu-header .hint {
+  font-family: 'Sora'; font-size: 10px; color: var(--muted); letter-spacing: 1px;
+}
+#nav-menu-header .hint kbd {
+  background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;
+  font-family: 'Sora'; font-size: 10px; color: var(--white);
+  margin: 0 2px;
+}
+
+#nav-menu-list {
+  flex: 1; overflow-y: auto;
+  padding: 12px 14px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+#nav-menu-list::-webkit-scrollbar { width: 6px; }
+#nav-menu-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+.menu-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer; color: var(--white);
+  font-size: 13px; line-height: 1.4;
+  margin-bottom: 3px;
+  border: 1px solid transparent;
+  transition: background 0.18s, border-color 0.18s;
+  text-align: left;
+}
+.menu-item:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+.menu-item.active {
+  background: linear-gradient(135deg, rgba(255,94,26,0.18), rgba(56,201,255,0.06));
+  border-color: rgba(255,94,26,0.4);
+}
+.menu-item .mi-num {
+  font-family: 'Sora'; font-weight: 700; font-size: 11px;
+  color: var(--muted); min-width: 26px; flex-shrink: 0;
+}
+.menu-item.active .mi-num { color: var(--orange); }
+.menu-item .mi-title {
+  font-family: 'Sora'; font-weight: 500; font-size: 12.5px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+#nav-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#nav-backdrop.open { opacity: 1; pointer-events: all; }
+
+/* ── COVER CENTERED LOGO (bigger) ── */
+.cover-logo {
+  height: 150px; width: auto;
+  margin: 0 auto 32px;
+  filter: drop-shadow(0 8px 24px rgba(255,94,26,0.35));
+  display: block;
+}
+@media (min-width: 1400px) {
+  .cover-logo { height: 180px; }
+}
+
+/* Cover stats row (animatable) */
+.cover-stat-row {
+  display: flex; gap: 28px; margin-top: 36px;
+  flex-wrap: wrap; justify-content: center;
+  font-family: 'Sora'; font-size: 13px; color: var(--muted);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.cover-stat-item b { color: var(--white); font-weight: 700; }
+/* Hide top-left logo when on cover slide */
+body.on-cover #apj-logo, body.on-cover #apj-name { opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+
+/* ── APJ ACADEMY LOGO ── */
+#apj-logo {
+  position: fixed; top: 12px; left: 18px; z-index: 998;
+  height: 44px; width: auto;
+  object-fit: contain;
+  opacity: 0.92;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  transition: opacity 0.2s;
+}
+#apj-logo:hover { opacity: 1; }
+#apj-name {
+  position: fixed; top: 22px; left: 70px; z-index: 998;
+  font-family: 'Sora'; font-size: 10px; font-weight: 700;
+  color: var(--white); letter-spacing: 2px; text-transform: uppercase;
+  opacity: 0.7;
+}
+#apj-name .tag { color: var(--orange); }
+
+/* ── COMPACT STEP LIST (replaces verbose step-rows) ── */
+.cstep-list {
+  display: flex; flex-direction: column;
+  gap: 8px;
+  width: 100%; max-width: 700px;
+  margin: 18px auto 0;
+}
+.cstep-row {
+  display: grid; grid-template-columns: 28px 1fr;
+  gap: 14px; align-items: flex-start;
+  padding: 4px 0;
+  text-align: left;
+}
+.cstep-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  color: #fff;
+  font-family: 'Sora'; font-weight: 700; font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cstep-num.s { background: linear-gradient(135deg, var(--sky), var(--violet)); }
+.cstep-num.m { background: linear-gradient(135deg, var(--mint), var(--sky)); }
+.cstep-num.v { background: linear-gradient(135deg, var(--violet), var(--orange)); }
+.cstep-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--sub);
+  line-height: 1.55;
+  padding-top: 3px;
+}
+.cstep-text b { color: var(--white); font-weight: 600; }
+.cstep-text strong { color: var(--orange); font-weight: 600; }
+
+/* Inline example merged into compact card */
+.compact-callout {
+  margin-top: 14px; padding: 12px 18px;
+  background: rgba(255,94,26,0.06);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px; color: var(--sub); text-align: left; line-height: 1.55;
+  max-width: 700px; width: 100%; margin-left: auto; margin-right: auto;
+}
+.compact-callout b {
+  color: var(--orange); letter-spacing: 1.5px; text-transform: uppercase;
+  font-size: 10px; font-family: 'Sora'; font-weight: 700; margin-right: 8px;
+}
+.compact-callout .accent { color: var(--amber); font-weight: 600; }
+.compact-callout.s { background: rgba(56,201,255,0.06); border-left-color: var(--sky); }
+.compact-callout.s b { color: var(--sky); }
+.compact-callout.v { background: rgba(155,109,255,0.06); border-left-color: var(--violet); }
+.compact-callout.v b { color: var(--violet); }
+.compact-callout.m { background: rgba(34,238,160,0.06); border-left-color: var(--mint); }
+.compact-callout.m b { color: var(--mint); }
+
+/* ── WHY VIDEO EDITING SLIDE ── */
+.why-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  width: 100%; max-width: 920px;
+  margin-top: 24px;
+}
+.why-card {
+  background: var(--card);
+  border: 1px solid var(--cborder);
+  border-radius: 16px;
+  padding: 22px 24px;
+  text-align: left;
+}
+.why-card .why-icon {
+  font-family: 'Sora'; font-size: 30px; font-weight: 800; line-height: 1;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.why-card .why-title { font-family: 'Sora'; font-weight: 700; font-size: 18px; margin-bottom: 8px; }
+.why-card .why-desc { font-size: 13.5px; color: var(--sub); line-height: 1.55; }
+.why-card.s .why-icon { background: linear-gradient(135deg, var(--sky), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.why-card.m .why-icon { background: linear-gradient(135deg, var(--mint), var(--sky)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.why-stat-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  width: 100%; max-width: 760px;
+  margin: 28px auto 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--cborder);
+}
+.why-stat { text-align: center; }
+.why-stat .v {
+  font-family: 'Sora'; font-weight: 800; font-size: 32px; line-height: 1;
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.why-stat .k { font-family: 'Sora'; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+
+/* ── LAYOUT POLISH · centering & max-widths ── */
+:root { --content-max: 940px; }
+.slide { padding: 52px 60px 80px; }
+.sub { max-width: 760px; margin-left: auto; margin-right: auto; }
+h1 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
+h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
+.g3 { max-width: 900px; }
+.g4 { max-width: 920px; }
+.ait { max-width: 880px; }
+.ex-box { max-width: 720px; margin-left: auto; margin-right: auto; }
+.pro-note { max-width: 720px; margin-left: auto; margin-right: auto; }
+.tl-anim { margin-left: auto; margin-right: auto; }
+.ab-anim { margin-left: auto; margin-right: auto; }
+
+@media (max-width: 1100px) {
+  .slide { padding: 40px 36px 70px; }
+  h1 { font-size: clamp(30px, 5vw, 56px); }
+  h2 { font-size: clamp(22px, 3.5vw, 42px); }
+}
+@media (max-width: 760px) {
+  .slide { padding: 32px 22px 70px; }
+  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .ab-anim { grid-template-columns: 1fr; }
+  .vpn-grid { grid-template-columns: 1fr; }
+  .kf-props { grid-template-columns: 1fr; }
+  #brand { display: none; }
+  #slide-label { display: none; }
+}
+</style>
+</head>
+<body>
+
+<a href="https://www.apjacademy.co.in/" target="_blank" rel="noopener">
+  <img id="apj-logo" src="https://www.apjacademy.co.in/wp-content/uploads/2020/07/apj_logo_100x100.png" alt="APJ Academy">
+</a>
+<div id="apj-name">APJ Academy <span class="tag">·</span> Learn Beyond Scoring</div>
+<div id="slide-label">01</div>
+<div id="prog"></div>
+
+<div id="deck">
+
+<!-- ============ 1. COVER ============ -->
+<section class="slide active" data-label="COVER">
+  <div class="blob blob-o" style="top:-160px; left:-120px; width:420px; height:420px;"></div>
+  <div class="blob blob-s" style="bottom:-160px; right:-120px; width:380px; height:380px;"></div>
+  <img class="cover-logo" src="https://www.apjacademy.co.in/wp-content/uploads/2020/07/apj_logo_100x100.png" alt="APJ Academy">
+  <div class="badge">▸ APJ Academy presents</div>
+  <h1>The skill of <span class="o">video editing.</span></h1>
+  <div class="cover-rule"></div>
+  <p class="sub">A hands-on three-day class. By the end of the session, you'll handle video editing confidently — from the first cut to a finished, polished reel.</p>
+  <div class="cover-stat-row">
+    <span class="cover-stat-item"><b>3 Days</b> · 60 min each</span>
+    <span class="cover-stat-item"><b>CapCut</b> · free</span>
+    <span class="cover-stat-item"><b>9 : 16</b> portrait</span>
+  </div>
+</section>
+
+<!-- ============ 1b. WHY VIDEO EDITING ============ -->
+<section class="slide" data-label="WHY THIS SKILL">
+  <div class="blob blob-o" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="blob blob-v" style="bottom:-100px; left:-100px; width:320px; height:320px;"></div>
+  <div class="eyebrow">Why this skill</div>
+  <h2>Video is the <span class="o">language</span> of 2026.</h2>
+  <p class="sub">Reading and writing won't be enough. Every Reel, every YouTube video, every wedding montage, every product launch — edited. Video editing is the new literacy. Your phone is enough to start.</p>
+
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon">01</div>
+      <div class="why-title">A 21st-century literacy</div>
+      <div class="why-desc">Like writing, but for moving images. The ability to take raw clips and shape a story is now expected — at school, at work, in life.</div>
+    </div>
+    <div class="why-card s">
+      <div class="why-icon">02</div>
+      <div class="why-title">Every career touches it</div>
+      <div class="why-desc">Content creators, marketers, teachers, doctors explaining cases, lawyers presenting evidence, founders pitching investors. Video edits.</div>
+    </div>
+    <div class="why-card m">
+      <div class="why-icon">03</div>
+      <div class="why-title">The barrier is gone</div>
+      <div class="why-desc">A phone, a free app, a story to tell. What used to need ₹5 lakh of equipment now needs nothing. The only gap left is the skill — that's what we're closing.</div>
+    </div>
+  </div>
+
+  <div class="why-stat-row">
+    <div class="why-stat"><div class="v">82%</div><div class="k">of internet traffic is video</div></div>
+    <div class="why-stat"><div class="v">3×</div><div class="k">more engagement than photos</div></div>
+    <div class="why-stat"><div class="v">∞</div><div class="k">stories you can now tell</div></div>
+  </div>
+</section>
+
+<!-- ============ 2. WORKSHOP AT A GLANCE ============ -->
+<section class="slide" data-label="OVERVIEW">
+  <div class="blob blob-o" style="top:-100px; right:-80px; width:340px; height:340px;"></div>
+  <div class="eyebrow">At a glance</div>
+  <h2>Three sessions, <span class="s">one polished reel</span>.</h2>
+  <p class="sub">Three one-hour sessions across three days. Day 1 builds foundations. Day 2 adds cinematic techniques. Day 3 brings keyframes, captions, and AI tools — the modern editor's toolkit.</p>
+  <table class="ait" style="margin-top: 32px;">
+    <thead>
+      <tr><th>Day</th><th>Focus</th><th>Lessons</th><th>Outcome</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>Day 1</b><br><span style="color:var(--muted);font-size:12px;">60 min</span></td><td>Foundations &amp; first cut</td><td>Video roll · Audio · Voice-over</td><td>First 30-sec reel exported</td></tr>
+      <tr><td><b>Day 2</b><br><span style="color:var(--muted);font-size:12px;">60 min</span></td><td>Polish &amp; submit</td><td>Transitions · Masking · Effects · Keyframes · Subtitles</td><td>Final reel submitted</td></tr>
+      <tr><td><b>Day 3</b><br><span style="color:var(--muted);font-size:12px;">60 min</span></td><td>Review &amp; AI tools</td><td>Reel reviews · Google Flow · Meta AI</td><td>Feedback + AI workflow</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 3. THE TOOL ============ -->
+<section class="slide" data-label="THE TOOL">
+  <div class="blob blob-o" style="bottom:-120px; left:-80px; width:360px; height:360px;"></div>
+  <div class="eyebrow">The Tool</div>
+  <h2>We're using <span class="o">CapCut</span>.</h2>
+  <p class="sub">Three apps could do this workshop. CapCut wins — runs anywhere, free, and forgiving for the youngest editor in the room.</p>
+  <div class="g3" style="margin-top: 28px;">
+    <div class="tool-link-card featured">
+      <div class="tl-head">
+        <div class="brand-mark bm-capcut">C</div>
+        <div>
+          <div class="tl-name">CapCut</div>
+          <div class="tl-pick">★ OUR PICK</div>
+        </div>
+      </div>
+      <div class="tl-meta">Phone · Tablet · Desktop · Web</div>
+      <div class="tl-desc">Free. Forgiving for an 8th grader, deep enough for an adult. Has every feature in this curriculum — masking, portrait transitions, voice-over, the lot.</div>
+      <a class="tl-link" href="https://www.capcut.com/" target="_blank" rel="noopener">↗ capcut.com</a>
+    </div>
+    <div class="tool-link-card">
+      <div class="tl-head">
+        <div class="brand-mark bm-luma">L</div>
+        <div>
+          <div class="tl-name">LumaFusion</div>
+        </div>
+      </div>
+      <div class="tl-meta">iPad · iPhone only</div>
+      <div class="tl-desc">Pro-grade timeline editing. ~$30 one-time. Apple-only and paid means it can't anchor a mixed-device classroom.</div>
+      <a class="tl-link" href="https://luma-touch.com/lumafusion-for-ios/" target="_blank" rel="noopener">↗ luma-touch.com</a>
+    </div>
+    <div class="tool-link-card">
+      <div class="tl-head">
+        <div class="brand-mark bm-clipchamp">C</div>
+        <div>
+          <div class="tl-name">Clipchamp</div>
+        </div>
+      </div>
+      <div class="tl-meta">Browser-based · Microsoft</div>
+      <div class="tl-desc">Free, runs in any browser. Decent backup if CapCut won't install. Weak on masking and portrait workflows.</div>
+      <a class="tl-link" href="https://clipchamp.com/en/" target="_blank" rel="noopener">↗ clipchamp.com</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3b. THE INDIA PROBLEM ============ -->
+<section class="slide" data-label="HEADS UP · INDIA">
+  <div class="blob blob-o" style="top:-120px; right:-100px; width:360px; height:360px; background: var(--orange);"></div>
+  <div class="eyebrow">Heads up · before Day 1</div>
+  <h2>CapCut is <span class="o">geo-blocked</span> in India.</h2>
+  <p class="sub">The web and apps were restricted in 2020. The fix is straightforward — connect a free VPN, then install. Three minutes of setup. Once installed, you can edit offline without the VPN.</p>
+  <div class="vpn-grid">
+    <div class="vpn-card recommended">
+      <div class="vc-tag">★ Recommended</div>
+      <div class="vc-name">ProtonVPN</div>
+      <div class="vc-desc">Free tier · unlimited data · servers in US, NL, JP. Trusted, no logs. Easiest install across all devices.</div>
+      <a class="vc-link" href="https://protonvpn.com/free-vpn" target="_blank" rel="noopener">↗ protonvpn.com/free-vpn</a>
+    </div>
+    <div class="vpn-card">
+      <div class="vc-tag">Free · 10 GB/mo</div>
+      <div class="vc-name">Windscribe</div>
+      <div class="vc-desc">10 GB/month free. Plenty for installing CapCut + occasional re-auth. Email signup unlocks the limit.</div>
+      <a class="vc-link" href="https://windscribe.com/" target="_blank" rel="noopener">↗ windscribe.com</a>
+    </div>
+    <div class="vpn-card">
+      <div class="vc-tag">Fastest · always-on</div>
+      <div class="vc-name">Cloudflare WARP</div>
+      <div class="vc-desc">Free, fast, no signup. Toggle on, you're done. Works on Mac, Windows, Android, iOS.</div>
+      <a class="vc-link" href="https://1.1.1.1/" target="_blank" rel="noopener">↗ 1.1.1.1</a>
+    </div>
+  </div>
+  <div class="pro-note" style="margin-top: 22px;"><b>How it works</b>VPN connects → your traffic looks like it's from the US → CapCut installer downloads normally → after install, disconnect VPN and use the app freely.</div>
+</section>
+
+<!-- ============ 3c. INSTALL ON MAC ============ -->
+<section class="slide" data-label="INSTALL · MAC">
+  <div class="blob blob-s" style="top:-100px; left:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow s">Install · on macOS</div>
+  <h2>CapCut for <span class="s">Mac</span>.</h2>
+  <p class="sub">Five steps. Takes under three minutes once your VPN is connected.</p>
+  <div style="margin-top: 24px; width: 100%; max-width: 820px;">
+    <div class="step-row"><div class="step-dot s">1</div><div class="step-body"><div class="step-title">Install ProtonVPN (or Cloudflare WARP)</div><div class="step-desc">Download from <b>protonvpn.com/free-vpn</b>. Sign up free. Open the app and connect to a <b>US server</b>.</div></div></div>
+    <div class="step-row"><div class="step-dot s">2</div><div class="step-body"><div class="step-title">Open Safari or Chrome</div><div class="step-desc">Verify VPN is on — visit <b>whatismyipaddress.com</b>. It should show a US location.</div></div></div>
+    <div class="step-row"><div class="step-dot s">3</div><div class="step-body"><div class="step-title">Go to <b>capcut.com/download</b></div><div class="step-desc">Click the <b>"Download for Mac"</b> button. A <b>.dmg</b> file lands in Downloads.</div></div></div>
+    <div class="step-row"><div class="step-dot s">4</div><div class="step-body"><div class="step-title">Open the .dmg, drag CapCut to Applications</div><div class="step-desc">Standard Mac install. Eject the disk image after.</div></div></div>
+    <div class="step-row"><div class="step-dot s">5</div><div class="step-body"><div class="step-title">Launch CapCut → sign in → done</div><div class="step-desc">After first sign-in, you can <b>disconnect the VPN</b>. App works offline.</div></div></div>
+  </div>
+  <div class="pro-note"><b>If blocked</b>If the .dmg fails to open, right-click → Open → Allow in System Settings → Privacy &amp; Security.</div>
+</section>
+
+<!-- ============ 3d. INSTALL ON WINDOWS ============ -->
+<section class="slide" data-label="INSTALL · WINDOWS">
+  <div class="blob blob-v" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow v">Install · on Windows</div>
+  <h2>CapCut for <span class="v">Windows</span>.</h2>
+  <p class="sub">Same idea as Mac — VPN first, then download. Works on Windows 10 and 11.</p>
+  <div style="margin-top: 24px; width: 100%; max-width: 820px;">
+    <div class="step-row"><div class="step-dot s">1</div><div class="step-body"><div class="step-title">Install ProtonVPN for Windows</div><div class="step-desc">From <b>protonvpn.com/free-vpn</b>. Free signup, .exe install. Open the app, connect to a <b>US server</b>.</div></div></div>
+    <div class="step-row"><div class="step-dot s">2</div><div class="step-body"><div class="step-title">Verify the VPN is connected</div><div class="step-desc">Check <b>whatismyipaddress.com</b> in your browser — should show a US location.</div></div></div>
+    <div class="step-row"><div class="step-dot s">3</div><div class="step-body"><div class="step-title">Visit <b>capcut.com/download</b></div><div class="step-desc">Click <b>"Download for Windows"</b>. A <b>.exe</b> installer downloads.</div></div></div>
+    <div class="step-row"><div class="step-dot s">4</div><div class="step-body"><div class="step-title">Run the installer</div><div class="step-desc">If SmartScreen warns, click <b>More info → Run anyway</b> (Microsoft hasn't co-signed it for India).</div></div></div>
+    <div class="step-row"><div class="step-dot s">5</div><div class="step-body"><div class="step-title">Open CapCut, sign in, disconnect VPN</div><div class="step-desc">Once signed in, the app runs offline — no VPN needed for editing.</div></div></div>
+  </div>
+  <div class="pro-note"><b>Backup option</b>If the installer fails, use <b>clipchamp.com</b> in your browser instead — it's pre-installed on Windows 11.</div>
+</section>
+
+<!-- ============ 3e. INSTALL ON MOBILE ============ -->
+<section class="slide" data-label="INSTALL · MOBILE">
+  <div class="blob blob-m" style="bottom:-120px; left:-100px; width:360px; height:360px;"></div>
+  <div class="eyebrow m">Install · on Phone</div>
+  <h2>CapCut for <span class="m">mobile</span>.</h2>
+  <p class="sub">Phones are trickier than desktop — app stores enforce regional rules. Here's the fastest legitimate path on each.</p>
+  <div class="g2" style="margin-top: 24px; max-width: 880px;">
+    <div class="card card-glow-m">
+      <div style="font-family: 'Sora'; font-weight: 700; font-size: 22px; margin-bottom: 4px;">Android <span style="color: var(--mint); font-size: 10px; letter-spacing: 1.5px; margin-left: 4px;">EASIER</span></div>
+      <div style="font-family: 'Sora'; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px;">~3 min</div>
+      <ol style="padding-left: 20px; font-size: 13.5px; color: var(--sub); line-height: 1.7;">
+        <li>Install <b style="color: var(--mint);">ProtonVPN</b> from Play Store</li>
+        <li>Connect to a <b>US server</b></li>
+        <li>Open Play Store → search <b>"CapCut"</b></li>
+        <li>If unavailable: install via <b>APKPure</b> (apkpure.com) — official mirror</li>
+        <li>Install · launch · sign in · done</li>
+      </ol>
+    </div>
+    <div class="card card-glow-s">
+      <div style="font-family: 'Sora'; font-weight: 700; font-size: 22px; margin-bottom: 4px;">iPhone / iPad <span style="color: var(--sky); font-size: 10px; letter-spacing: 1.5px; margin-left: 4px;">2 OPTIONS</span></div>
+      <div style="font-family: 'Sora'; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px;">5–10 min</div>
+      <ol style="padding-left: 20px; font-size: 13.5px; color: var(--sub); line-height: 1.7;">
+        <li><b style="color: var(--sky);">Easiest:</b> use <b>capcut.com/editor</b> in Safari — full editor, no install, works in India</li>
+        <li><b>If you want the app:</b> change Apple ID region to US (Settings → Apple ID → Media &amp; Purchases → Country)</li>
+        <li>Connect VPN to US, then App Store → search CapCut</li>
+        <li>Heads up: changing region clears existing subscriptions</li>
+      </ol>
+    </div>
+  </div>
+  <div class="pro-note"><b>Class rule</b>If any of this looks scary on a student's phone, default to the <b>desktop install</b> or the <b>capcut.com/editor</b> web version — both work for the entire workshop.</div>
+</section>
+
+<!-- ============ 3f. CLIPCHAMP TUTORIAL ============ -->
+<section class="slide" data-label="CLIPCHAMP · BACKUP">
+  <div class="blob blob-s" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow s">Backup option · the browser editor</div>
+  <h2>How to use <span class="s">Clipchamp</span>.</h2>
+  <p class="sub">Microsoft's free browser editor. Pre-installed on Windows 11. Use it as fallback if CapCut won't install, or for quick edits on a school computer.</p>
+  <div class="cstep-list">
+    <div class="cstep-row"><div class="cstep-num s">1</div><div class="cstep-text"><b>Visit clipchamp.com</b> → click "Try for free" → sign in with Microsoft, Google, or email.</div></div>
+    <div class="cstep-row"><div class="cstep-num s">2</div><div class="cstep-text"><b>Create a new video</b> → set aspect ratio to <b>9:16 portrait</b> in the top-right dropdown.</div></div>
+    <div class="cstep-row"><div class="cstep-num s">3</div><div class="cstep-text"><b>Drag clips</b> onto the timeline. Same workflow as CapCut — trim, split, layer A-roll and B-roll, add audio.</div></div>
+    <div class="cstep-row"><div class="cstep-num s">4</div><div class="cstep-text"><b>Auto-captions</b> are built-in: click any clip → Captions → Auto-generate. Free.</div></div>
+    <div class="cstep-row"><div class="cstep-num s">5</div><div class="cstep-text"><b>Export</b> → MP4 → 1080p (top-right). File downloads to your computer.</div></div>
+  </div>
+  <div class="compact-callout s"><b>vs CapCut</b>No advanced masking · no real keyframes · no mobile app. Plan B, not your daily driver.</div>
+</section>
+
+<!-- ============ 3g. INSTAEDITS INTRO ============ -->
+<section class="slide" data-label="INSTAEDITS · NEW ARRIVAL">
+  <div class="blob blob-v" style="bottom:-120px; left:-80px; width:360px; height:360px;"></div>
+  <div class="eyebrow v">Worth knowing · new mobile editor</div>
+  <h2>Instagram <span class="v">Edits</span>.</h2>
+  <p class="sub">Meta launched <b>Edits</b> in 2025 as their answer to CapCut. Free, mobile-only, polished, made for Reels — but feature-light compared to CapCut. Worth knowing about; not our primary tool.</p>
+  <div class="g2" style="margin-top: 24px; max-width: 880px;">
+    <div class="card card-glow-v">
+      <div style="font-family: 'Sora'; font-weight: 700; font-size: 18px; margin-bottom: 4px; color: var(--mint);">✓ What it does well</div>
+      <div style="font-family: 'Sora'; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px;">strengths</div>
+      <ul style="padding-left: 18px; font-size: 14px; color: var(--sub); line-height: 1.65;">
+        <li>Trim, split, layer — basics covered</li>
+        <li>Music + voice-over recording</li>
+        <li>Auto-captions, native</li>
+        <li>9:16 default — built for Reels</li>
+        <li>Direct publish to Instagram</li>
+        <li>Clean, modern UI</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div style="font-family: 'Sora'; font-weight: 700; font-size: 18px; margin-bottom: 4px; color: var(--orange);">✗ What it lacks vs CapCut</div>
+      <div style="font-family: 'Sora'; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px;">limitations</div>
+      <ul style="padding-left: 18px; font-size: 14px; color: var(--sub); line-height: 1.65;">
+        <li>No keyframes (yet)</li>
+        <li>No advanced masking</li>
+        <li>Limited multi-track timeline</li>
+        <li>No desktop version</li>
+        <li>Smaller effects library</li>
+        <li>Locked to Meta ecosystem</li>
+      </ul>
+    </div>
+  </div>
+  <div class="pro-note"><b>Verdict</b>Use Edits for fast Instagram-native posts on the go. For everything in this workshop, stick with CapCut — you need its full toolkit.</div>
+</section>
+
+<!-- ============ 4. TEN LESSONS ============ -->
+<section class="slide" data-label="CURRICULUM">
+  <div class="blob blob-v" style="top:-100px; left:-100px; width:380px; height:380px;"></div>
+  <div class="blob blob-s" style="bottom:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow s">The curriculum</div>
+  <h2>Ten lessons. <span class="o">Three days.</span></h2>
+  <div style="font-family: 'Sora'; font-weight: 700; font-size: 11px; letter-spacing: 2px; color: var(--orange); text-transform: uppercase; margin: 24px 0 12px;">— Days 1 &amp; 2 · the foundations —</div>
+  <div class="g3">
+    <div class="lesson-grid-card"><div class="lg-num">01</div><div class="lg-name">Video Roll</div><div class="lg-desc">B-roll. Cutting between clips so your story flows.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">02</div><div class="lg-name">Audio Roll</div><div class="lg-desc">Music and sound design. Turns a clip into a vibe.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">03</div><div class="lg-name">Voice-Over</div><div class="lg-desc">Your voice on top of visuals. Makes anything feel like a story.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">04</div><div class="lg-name">Transitions</div><div class="lg-desc">Whip pans, zoom matches, mask wipes. Cinematic feel.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">05</div><div class="lg-name">Masking</div><div class="lg-desc">Hide, reveal, combine. One trick that looks like magic.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">06</div><div class="lg-name">Effects &amp; Text</div><div class="lg-desc">Color, glow, captions. Less is more — two effects max.</div></div>
+  </div>
+  <div style="font-family: 'Sora'; font-weight: 700; font-size: 11px; letter-spacing: 2px; color: var(--sky); text-transform: uppercase; margin: 22px 0 12px;">— Day 3 · the modern toolkit —</div>
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 900px; width: 100%;">
+    <div class="lesson-grid-card"><div class="lg-num" style="background: linear-gradient(135deg, var(--sky), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">07</div><div class="lg-name" style="font-size: 15px;">Keyframes</div><div class="lg-desc" style="font-size: 12.5px;">Animate position, scale, opacity.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num" style="background: linear-gradient(135deg, var(--sky), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">08</div><div class="lg-name" style="font-size: 15px;">Subtitles</div><div class="lg-desc" style="font-size: 12.5px;">Auto-generate captions, then style.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num" style="background: linear-gradient(135deg, var(--sky), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">09</div><div class="lg-name" style="font-size: 15px;">Google Flow</div><div class="lg-desc" style="font-size: 12.5px;">AI text-to-video for B-roll.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num" style="background: linear-gradient(135deg, var(--sky), var(--violet)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">10</div><div class="lg-name" style="font-size: 15px;">Meta AI</div><div class="lg-desc" style="font-size: 12.5px;">Animate stills · frame morphing.</div></div>
+  </div>
+</section>
+
+<!-- ============ 5. VOCABULARY INTRO ============ -->
+<section class="slide" data-label="VOCABULARY">
+  <div class="blob blob-v" style="top:-150px; right:-100px; width:400px; height:400px;"></div>
+  <div class="eyebrow v">First, the words</div>
+  <h1>The <span class="o">vocabulary</span>.</h1>
+  <p class="sub">Editing has its own quiet language. Three concepts every editor uses every single day. Learn these and the rest is muscle memory.</p>
+  <div class="g3" style="margin-top: 32px;">
+    <div class="lesson-grid-card"><div class="lg-num">01</div><div class="lg-name">Cut &amp; Split</div><div class="lg-desc">The two most basic timeline moves. They sound similar — they do completely different jobs.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">02</div><div class="lg-name">A-Roll &amp; B-Roll</div><div class="lg-desc">Every video is built from these two layers. Knowing the difference is half the craft.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">03</div><div class="lg-name">Aspect Ratio</div><div class="lg-desc">The shape of your frame. Pick wrong and you'll spend hours fixing every shot.</div></div>
+  </div>
+</section>
+
+<!-- ============ 6. CUT ============ -->
+<section class="slide" data-label="CONCEPT 01 · CUT">
+  <div class="blob blob-o" style="bottom:-120px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow">Concept 01</div>
+  <h1>Cut.</h1>
+  <p class="sub"><b>To remove</b> a portion from a clip — the boring start, a stumble in the middle, the dead air at the end. The clip gets <span class="o">shorter</span>.</p>
+
+  <div class="tl-anim">
+    <div class="tl-anim-label">
+      <span>Timeline · drag the trim handles inward</span>
+      <span class="live">Live demo</span>
+    </div>
+    <div class="cut-strip">
+      <div class="ghost l"></div>
+      <div class="ghost r"></div>
+      <div class="clip">walking · 8s → 3s</div>
+      <div class="handle l"></div>
+      <div class="handle r"></div>
+    </div>
+    <div class="tl-meta-row">
+      <span>00 : 00 — 00 : 08</span>
+      <span class="out">Trimmed: <b style="color: var(--orange);">5 seconds removed</b></span>
+    </div>
+  </div>
+
+  <div style="margin-top: 18px; width: 100%; max-width: 720px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot" style="width:28px; height:28px; font-size:12px;">1</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Tap</b> the clip — white handles appear.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot" style="width:28px; height:28px; font-size:12px;">2</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Drag left handle</b> in to chop the start.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot" style="width:28px; height:28px; font-size:12px;">3</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Drag right handle</b> in to chop the end.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot" style="width:28px; height:28px; font-size:12px;">4</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Release</b> at the keeper frame.</div></div>
+  </div>
+
+  <div class="pro-note" style="margin-top: 16px;"><b>Pro tip</b>Trim more than you think. A tight clip almost always beats a loose one.</div>
+</section>
+
+<!-- ============ 7. SPLIT ============ -->
+<section class="slide" data-label="CONCEPT 01 · SPLIT">
+  <div class="blob blob-s" style="top:-120px; left:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow s">Concept 01 · part two</div>
+  <h1>Split.</h1>
+  <p class="sub"><b>To divide</b> one clip into two pieces at a single point. The total length <span class="s">stays the same</span> — but now you can move, swap, or treat each half differently.</p>
+
+  <div class="tl-anim">
+    <div class="tl-anim-label">
+      <span>Timeline · playhead drops, scissors splits, gap appears</span>
+      <span class="live">Live demo</span>
+    </div>
+    <div class="split-strip">
+      <div class="clip-a">part · A</div>
+      <div class="clip-b">part · B</div>
+      <div class="ph-icon">✂</div>
+      <div class="ph"></div>
+    </div>
+    <div class="tl-meta-row">
+      <span>1 clip · split at 00 : 07</span>
+      <span class="out">Result: <b style="color: var(--orange);">2 independent pieces</b></span>
+    </div>
+  </div>
+
+  <div style="margin-top: 18px; width: 100%; max-width: 720px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot s" style="width:28px; height:28px; font-size:12px;">1</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Drag playhead</b> to the split point.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot s" style="width:28px; height:28px; font-size:12px;">2</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Tap the clip</b> to select it.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot s" style="width:28px; height:28px; font-size:12px;">3</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Tap SPLIT</b> in the toolbar.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot s" style="width:28px; height:28px; font-size:12px;">4</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Now</b> delete, move, or effect each half.</div></div>
+  </div>
+
+  <div class="pro-note" style="margin-top: 16px;"><b>Remember</b>Cut <b>removes</b>. Split <b>divides</b>. Two completely different jobs, almost identical names.</div>
+</section>
+
+<!-- ============ 8. A-ROLL & B-ROLL ============ -->
+<section class="slide" data-label="CONCEPT 02 · A-ROLL & B-ROLL">
+  <div class="blob blob-o" style="top:-100px; left:-100px; width:320px; height:320px;"></div>
+  <div class="blob blob-s" style="bottom:-100px; right:-100px; width:320px; height:320px;"></div>
+  <div class="eyebrow">Concept 02</div>
+  <h1>A-Roll <span class="s">&amp; B-Roll</span>.</h1>
+  <p class="sub"><b>A-roll</b> is the voice — your face, your audio, your story. <b>B-roll</b> is the eyes — cut-ins that show what you're saying. Watch how they stack:</p>
+
+  <div class="ab-anim">
+    <div class="ab-vp">
+      <div class="ab-vp-frame vp-a">
+        <div class="vp-tag">A · Talking head</div>
+        <div class="vp-content">"I love mornings…"</div>
+      </div>
+      <div class="ab-vp-frame vp-b1">
+        <div class="vp-tag">B · Sunrise</div>
+        <div class="vp-content">— sun coming up —</div>
+      </div>
+      <div class="ab-vp-frame vp-b2">
+        <div class="vp-tag">B · Coffee pour</div>
+        <div class="vp-content">— pouring shot —</div>
+      </div>
+      <div class="ab-vp-frame vp-b3">
+        <div class="vp-tag">B · Walking</div>
+        <div class="vp-content">— shoes on pavement —</div>
+      </div>
+    </div>
+    <div class="ab-tracks">
+      <div class="ab-track">
+        <div class="ab-tlbl">B-roll</div>
+        <div class="ab-strip">
+          <div class="ab-clip ab-clip-b1">SUNRISE</div>
+          <div class="ab-clip ab-clip-b2">POUR</div>
+          <div class="ab-clip ab-clip-b3">WALK</div>
+        </div>
+      </div>
+      <div class="ab-track">
+        <div class="ab-tlbl">A-roll</div>
+        <div class="ab-strip">
+          <div class="ab-clip ab-clip-a">YOU TALKING · audio runs the entire length</div>
+        </div>
+      </div>
+      <div class="ab-ph-overlay"><div class="ab-ph"></div></div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 22px; max-width: 880px; width: 100%; margin-top: 18px; font-size: 13px; color: var(--sub); text-align: left;">
+    <div style="flex: 1; padding: 14px 16px; background: rgba(255,94,26,0.06); border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0;">
+      <div style="font-family: 'Sora'; font-weight: 700; font-size: 11px; color: var(--orange); letter-spacing: 1.5px; margin-bottom: 4px;">A-ROLL</div>
+      Continuous track at the bottom. Your audio plays the entire time — even when B-roll covers the picture above.
+    </div>
+    <div style="flex: 1; padding: 14px 16px; background: rgba(56,201,255,0.06); border-left: 3px solid var(--sky); border-radius: 0 8px 8px 0;">
+      <div style="font-family: 'Sora'; font-weight: 700; font-size: 11px; color: var(--sky); letter-spacing: 1.5px; margin-bottom: 4px;">B-ROLL</div>
+      Cut-ins on the upper track. 2–3 seconds each. Visual changes; A-roll audio keeps playing underneath.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. ASPECT RATIO ============ -->
+<section class="slide" data-label="CONCEPT 03 · ASPECT RATIO">
+  <div class="blob blob-m" style="top:-120px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow m">Concept 03</div>
+  <h1>Aspect <span class="m">ratio</span>.</h1>
+  <p class="sub">The shape of your frame. Different platforms want different shapes. Pick the right one <b>before</b> you start editing — fixing it after means redoing every shot.</p>
+  <div class="g4" style="margin-top: 28px; max-width: 880px; align-items: end;">
+    <div class="ratio-card featured">
+      <div class="r-frame r-9-16">
+        <div class="r-reels">
+          <div class="play-btn"></div>
+          <div class="actions">
+            <div>♥</div><div>💬</div><div>↗</div>
+          </div>
+          <div class="caption">@yourhandle</div>
+        </div>
+      </div>
+      <div class="r-ratio">9 : 16</div>
+      <div class="r-name">Portrait · Reels</div>
+      <div class="r-where">TikTok · Reels<br>Stories · Shorts</div>
+    </div>
+    <div class="ratio-card">
+      <div class="r-frame r-16-9">
+        <div class="r-cinema">
+          <div class="play-btn"></div>
+          <div class="progress"></div>
+        </div>
+      </div>
+      <div class="r-ratio">16 : 9</div>
+      <div class="r-name">Cinema · Wide</div>
+      <div class="r-where">YouTube · TV<br>Slides · Web</div>
+    </div>
+    <div class="ratio-card">
+      <div class="r-frame r-1-1">
+        <div class="r-square">
+          <div class="grid-pat">
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          </div>
+        </div>
+      </div>
+      <div class="r-ratio">1 : 1</div>
+      <div class="r-name">Square Post</div>
+      <div class="r-where">LinkedIn<br>Old IG feed</div>
+    </div>
+    <div class="ratio-card">
+      <div class="r-frame r-4-5">
+        <div class="r-feed">
+          <div class="ig-actions">♥ 💬 ✈</div>
+        </div>
+      </div>
+      <div class="r-ratio">4 : 5</div>
+      <div class="r-name">Vertical Feed</div>
+      <div class="r-where">Instagram feed<br>Facebook</div>
+    </div>
+  </div>
+  <div class="pro-note" style="margin-top: 22px;"><b>Do this first</b>In CapCut: New Project → Aspect Ratio → 9 : 16 → THEN import your clips. Every project. Every time.</div>
+</section>
+
+<!-- ============ 10. DAY 1 DIVIDER ============ -->
+<section class="slide" data-label="DAY 01">
+  <div class="blob blob-o" style="top:-120px; left:-100px; width:380px; height:380px;"></div>
+  <div class="blob blob-s" style="bottom:-120px; right:-100px; width:340px; height:340px;"></div>
+  <div class="section-hero">
+    <div class="eyebrow">Session 01 · 60 minutes</div>
+    <div class="sec-num">DAY 01</div>
+    <div class="sec-line"></div>
+    <h2>Foundations &amp; <span class="o">first export</span>.</h2>
+    <p class="sub">By the end of this hour, every student has imported clips, added music, recorded a voice-over, and exported a real video. The "I made this" moment is what hooks them for Day 2.</p>
+  </div>
+</section>
+
+<!-- ============ 11. DAY 1 SCHEDULE ============ -->
+<section class="slide" data-label="DAY 01 · SCHEDULE">
+  <div class="blob blob-o" style="bottom:-120px; left:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow">Day 01 · run of show</div>
+  <h2>Sixty minutes, <span class="o">minute by minute</span>.</h2>
+  <table class="ait" style="margin-top: 28px;">
+    <thead><tr><th>Time</th><th>Segment</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td><b>00:00–00:05</b></td><td>The wow moment</td><td>Watch raw vs. edited. Spot the difference.</td></tr>
+      <tr><td><b>00:05–00:10</b></td><td>Tool tour</td><td>CapCut walkthrough. Set 9:16 on every device.</td></tr>
+      <tr><td><b>00:10–00:20</b></td><td><b style="color:var(--orange)">Lesson 1 · Video Roll</b></td><td>Import, trim, split, reorder.</td></tr>
+      <tr><td><b>00:20–00:30</b></td><td><b style="color:var(--orange)">Lesson 2 · Audio Roll</b></td><td>Music, volume, fade in / fade out.</td></tr>
+      <tr><td><b>00:30–00:40</b></td><td><b style="color:var(--orange)">Lesson 3 · Voice-Over</b></td><td>Record, place on its own track, duck the music.</td></tr>
+      <tr><td><b>00:40–00:55</b></td><td>Build &amp; export</td><td>30-second reel using the starter pack.</td></tr>
+      <tr><td><b>00:55–01:00</b></td><td>Show, tell, homework</td><td>Watch each one. Reveal the shoot list.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 12. LESSON 1 ============ -->
+<section class="slide" data-label="LESSON 01 · VIDEO ROLL">
+  <div class="blob blob-o" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow">Lesson 01 of 10</div>
+  <h2>Video Roll — <span class="o">show three things, not one</span>.</h2>
+  <p class="sub">Cut between clips so eyes stay glued. Never let one shot run longer than four seconds.</p>
+  <div class="cstep-list">
+    <div class="cstep-row"><div class="cstep-num">1</div><div class="cstep-text"><b>Import 3+ clips</b> into the media panel from your phone or library.</div></div>
+    <div class="cstep-row"><div class="cstep-num">2</div><div class="cstep-text"><b>Drag onto timeline</b> in order — wide → close → action is the classic 3-shot story.</div></div>
+    <div class="cstep-row"><div class="cstep-num">3</div><div class="cstep-text"><b>Trim each clip</b> to 2–3 seconds. Keep only the best moment. Be ruthless.</div></div>
+    <div class="cstep-row"><div class="cstep-num">4</div><div class="cstep-text"><b>Reorder</b> by dragging. Try sequences — feel which one tells the story better.</div></div>
+  </div>
+  <div class="compact-callout"><b>Example</b>Wide of your room, close of your desk, hand-on-laptop. Trim each to 3 sec. Order: <span class="accent">wide → close → action</span>. Tiny story in 9 seconds.</div>
+</section>
+
+<!-- ============ 13. LESSON 2 ============ -->
+<section class="slide" data-label="LESSON 02 · AUDIO ROLL">
+  <div class="blob blob-s" style="top:-100px; left:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow s">Lesson 02 of 10</div>
+  <h2>Audio Roll — <span class="s">music sets the mood</span>.</h2>
+  <p class="sub">The right track turns a clip into a vibe. The wrong one turns a wedding into a horror movie.</p>
+  <div class="cstep-list">
+    <div class="cstep-row"><div class="cstep-num s">1</div><div class="cstep-text"><b>Add music</b> from CapCut's free library, or import your own track.</div></div>
+    <div class="cstep-row"><div class="cstep-num s">2</div><div class="cstep-text"><b>Drop on a separate track</b> below your video — keep audio on its own row.</div></div>
+    <div class="cstep-row"><div class="cstep-num s">3</div><div class="cstep-text"><b>Volume around 30–50%</b> — music is the mood, not the main event.</div></div>
+    <div class="cstep-row"><div class="cstep-num s">4</div><div class="cstep-text"><b>Fade in</b> at start, <b>fade out</b> at end. Always. Hard cuts feel amateur.</div></div>
+  </div>
+  <div class="compact-callout s"><b>Cheat code</b>Pick your music <span class="accent">first</span>, then cut your video to the beat. Always.</div>
+</section>
+
+<!-- ============ 14. LESSON 3 ============ -->
+<section class="slide" data-label="LESSON 03 · VOICE-OVER">
+  <div class="blob blob-v" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow v">Lesson 03 of 10</div>
+  <h2>Voice-Over — <span class="v">become the narrator</span>.</h2>
+  <p class="sub">Want your video to feel like a story? Add your voice. The single biggest upgrade you can make in thirty seconds.</p>
+  <div class="cstep-list">
+    <div class="cstep-row"><div class="cstep-num v">1</div><div class="cstep-text"><b>Audio → Record</b>. Say one line. Stop. Don't overthink it.</div></div>
+    <div class="cstep-row"><div class="cstep-num v">2</div><div class="cstep-text"><b>Drag voice onto its own track</b> — below music, above video.</div></div>
+    <div class="cstep-row"><div class="cstep-num v">3</div><div class="cstep-text"><b>Duck the music</b> while you talk — drop it from 40% to 15% during your voice.</div></div>
+    <div class="cstep-row"><div class="cstep-num v">4</div><div class="cstep-text"><b>Trim the "ums"</b>. Be ruthless. Silence always beats stumble.</div></div>
+  </div>
+  <div class="compact-callout v"><b>Mic hack</b>Cup your hand around your phone mic. Sounds <span class="accent">10× more pro</span> instantly.</div>
+</section>
+
+<!-- ============ 15. DAY 1 CAPSTONE / HOMEWORK ============ -->
+<section class="slide" data-label="DAY 01 · HOMEWORK">
+  <div class="blob blob-a" style="top:-120px; left:-100px; width:360px; height:360px; background: var(--amber);"></div>
+  <div class="eyebrow a">Tonight's assignment</div>
+  <h2>Go <span class="a">shoot</span>.</h2>
+  <p class="sub">Five short vertical clips on your phone. Pick one theme — my morning, my pet, my hobby, a place I love.</p>
+  <div class="cstep-list">
+    <div class="cstep-row"><div class="cstep-num">1</div><div class="cstep-text"><b>A wide shot</b> — show the whole scene. Set the table.</div></div>
+    <div class="cstep-row"><div class="cstep-num">2</div><div class="cstep-text"><b>A close-up</b> — a hand, a face, a single detail.</div></div>
+    <div class="cstep-row"><div class="cstep-num">3</div><div class="cstep-text"><b>A movement shot</b> — walking, pouring, opening, anything that flows.</div></div>
+    <div class="cstep-row"><div class="cstep-num">4</div><div class="cstep-text"><b>A "you" shot</b> — selfie. Your face in the frame.</div></div>
+    <div class="cstep-row"><div class="cstep-num">5</div><div class="cstep-text"><b>A "wow" shot</b> — whatever feels coolest. Your hero.</div></div>
+  </div>
+  <div class="compact-callout"><b>Specs</b>Portrait <span class="accent">9:16</span> · 3–8 seconds each · hold steady · different angles.</div>
+</section>
+
+<!-- ============ 16. DAY 2 DIVIDER ============ -->
+<section class="slide" data-label="DAY 02">
+  <div class="blob blob-v" style="top:-120px; right:-100px; width:380px; height:380px;"></div>
+  <div class="blob blob-m" style="bottom:-120px; left:-100px; width:340px; height:340px;"></div>
+  <div class="section-hero">
+    <div class="eyebrow v">Session 02 · 60 minutes</div>
+    <div class="sec-num" style="background: linear-gradient(135deg, var(--violet), var(--mint)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DAY 02</div>
+    <div class="sec-line" style="background: linear-gradient(90deg, var(--violet), var(--mint));"></div>
+    <h2>Polish &amp; <span class="m">submit</span>.</h2>
+    <p class="sub">Today covers everything else — transitions, masking, effects, keyframes, subtitles. End of session: the final reel is exported and submitted for tomorrow's review.</p>
+  </div>
+</section>
+
+<!-- ============ 17. LESSON 4 — TRANSITIONS ============ -->
+<section class="slide" data-label="LESSON 04 · TRANSITIONS">
+  <div class="blob blob-v" style="top:-100px; left:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow v">Lesson 04 of 10</div>
+  <h2>Transitions — <span class="v">three moves, that's it</span>.</h2>
+  <p class="sub">Three transitions that make any reel feel cinematic. Master these and you've beat 80% of the internet.</p>
+  <div class="cstep-list">
+    <div class="cstep-row"><div class="cstep-num v">1</div><div class="cstep-text"><b>Whip Pan</b> — fast horizontal motion blur between clips. All energy. For high-energy scene changes.</div></div>
+    <div class="cstep-row"><div class="cstep-num v">2</div><div class="cstep-text"><b>Zoom Match</b> — both clips zoom into the same point. Two close-ups feel like one continuous push-in.</div></div>
+    <div class="cstep-row"><div class="cstep-num v">3</div><div class="cstep-text"><b>Mask Wipe</b> — circle, square, or shape reveal. Feels like Apple. Use sparingly — it's flashy.</div></div>
+  </div>
+  <div class="compact-callout v"><b>The rule</b>One transition style per video. Mixing all three = chaos. <span class="accent">Pick one and stick.</span></div>
+</section>
+
+<!-- ============ 18. LESSON 5 — MASKING ============ -->
+<section class="slide" data-label="LESSON 05 · MASKING">
+  <div class="blob blob-m" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow m">Lesson 05 of 10</div>
+  <h2>Masking — <span class="m">text behind subject</span>.</h2>
+  <p class="sub">Hiding part of a clip so something else shows through. One trick that looks like Apple-commercial magic.</p>
+  <div class="cstep-list">
+    <div class="cstep-row"><div class="cstep-num m">1</div><div class="cstep-text"><b>Place your video clip</b> on the timeline. A "you walking" shot works perfectly.</div></div>
+    <div class="cstep-row"><div class="cstep-num m">2</div><div class="cstep-text"><b>Add text ABOVE the video</b> — your name, big and bold, filling the frame.</div></div>
+    <div class="cstep-row"><div class="cstep-num m">3</div><div class="cstep-text"><b>Duplicate the video</b> on top of the text. Same clip, stacked above.</div></div>
+    <div class="cstep-row"><div class="cstep-num m">4</div><div class="cstep-text"><b>Use Remove Background</b> on the top video. Subject appears in front of the text — text feels embedded in the scene.</div></div>
+  </div>
+  <div class="compact-callout m"><b>Example</b>Walking shot + "AANYA" text behind + bg-removed copy on top. Your name appears huge behind you, you walk in front. <span class="accent">One trick — looks pro.</span></div>
+</section>
+
+<!-- ============ 19. LESSON 6 — EFFECTS ============ -->
+<section class="slide" data-label="LESSON 06 · EFFECTS &amp; TEXT">
+  <div class="blob blob-o" style="bottom:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow">Lesson 06 of 10</div>
+  <h2>Effects &amp; Text — <span class="o">less is more</span>.</h2>
+  <p class="sub">The finishing layer. Color filters, glow, captions, beat-synced text. Used right, they elevate. Used wrong, they ruin.</p>
+  <div class="cstep-list">
+    <div class="cstep-row"><div class="cstep-num">1</div><div class="cstep-text"><b>One color filter</b> on the whole timeline — cinematic, warm, or cool. Pick one, apply globally.</div></div>
+    <div class="cstep-row"><div class="cstep-num">2</div><div class="cstep-text"><b>Auto-generate captions</b>, then style with one font, one color. Match the vibe.</div></div>
+    <div class="cstep-row"><div class="cstep-num">3</div><div class="cstep-text"><b>One or two</b> beat-synced text moments. Just the punchlines, not every line.</div></div>
+    <div class="cstep-row"><div class="cstep-num">4</div><div class="cstep-text"><b>Optional</b> — a single glow or zoom on a hero shot. One emphasized moment. Then stop.</div></div>
+  </div>
+  <div class="compact-callout"><b>The rule</b><span class="accent">Two effects max</span> per video. More than that and it screams "amateur."</div>
+</section>
+
+<!-- ============ LESSON 7 — KEYFRAMES ============ -->
+<section class="slide" data-label="LESSON 07 · KEYFRAMES">
+  <div class="blob blob-o" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow">Lesson 07 of 10</div>
+  <h2>Keyframes — <span class="o">the secret to motion</span>.</h2>
+  <p class="sub">A keyframe is a snapshot of a property at a moment in time. Two keyframes = animation. The editor smoothly fills in everything between them.</p>
+
+  <div class="kf-anim">
+    <div class="tl-anim-label">
+      <span>Keyframe 1 → Keyframe 2 · the editor interpolates between them</span>
+      <span class="live">Live demo</span>
+    </div>
+    <div class="kf-stage">
+      <div class="kf-track"></div>
+      <div class="kf-marker start"></div>
+      <div class="kf-marker end"></div>
+      <span class="kf-marker-label start">Keyframe 1</span>
+      <span class="kf-marker-label end">Keyframe 2</span>
+      <div class="kf-object"></div>
+    </div>
+    <div class="kf-props">
+      <div class="kf-prop"><div class="k">Position</div><div class="v">8% <span class="arrow">→</span> 92%</div></div>
+      <div class="kf-prop"><div class="k">Scale</div><div class="v">50% <span class="arrow">→</span> 140%</div></div>
+      <div class="kf-prop"><div class="k">Opacity</div><div class="v">40% <span class="arrow">→</span> 100%</div></div>
+    </div>
+  </div>
+
+  <div style="margin-top: 18px; width: 100%; max-width: 720px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot" style="width:28px; height:28px; font-size:12px;">1</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Move playhead</b> to start, set property, tap <b style="color: var(--orange);">◆</b> diamond.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot" style="width:28px; height:28px; font-size:12px;">2</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Move playhead</b> to end, change property — keyframe added automatically.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot" style="width:28px; height:28px; font-size:12px;">3</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Press play</b> — your property smoothly animates between the two states.</div></div>
+    <div style="display: flex; gap: 10px; align-items: flex-start;"><div class="step-dot" style="width:28px; height:28px; font-size:12px;">4</div><div style="font-size: 13px; color: var(--sub); padding-top: 4px;"><b style="color: var(--white);">Animate</b>: position · scale · opacity · rotation.</div></div>
+  </div>
+
+  <div class="pro-note" style="margin-top: 14px;"><b>Pro tip</b>2 keyframes is a beginner. 3+ is overkill. Less is always more — let the motion be subtle.</div>
+</section>
+
+<!-- ============ LESSON 8 — SUBTITLES ============ -->
+<section class="slide" data-label="LESSON 08 · SUBTITLES">
+  <div class="blob blob-s" style="top:-100px; left:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow s">Lesson 08 of 10</div>
+  <h2>Subtitles — <span class="s">auto-generate, then style</span>.</h2>
+  <p class="sub">80% of social video is watched on mute. Subtitles aren't optional — they're the difference between scrolled-past and watched.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 360px; gap: 36px; max-width: 880px; margin-top: 24px; align-items: center;">
+    <div style="text-align: left;">
+      <div style="font-family: 'Sora'; font-size: 11px; letter-spacing: 1.5px; color: var(--orange); text-transform: uppercase; margin-bottom: 12px; font-weight: 700;">Generate · 4 steps</div>
+      <div class="step-row" style="padding: 8px 0;"><div class="step-dot s" style="width:28px; height:28px; font-size:12px;">1</div><div class="step-body"><div class="step-title" style="font-size: 14px;">Tap "Captions" → "Auto Captions"</div><div class="step-desc" style="font-size: 12.5px;">In the CapCut toolbar.</div></div></div>
+      <div class="step-row" style="padding: 8px 0;"><div class="step-dot s" style="width:28px; height:28px; font-size:12px;">2</div><div class="step-body"><div class="step-title" style="font-size: 14px;">Choose your language</div><div class="step-desc" style="font-size: 12.5px;">English, Tamil, Hindi, etc.</div></div></div>
+      <div class="step-row" style="padding: 8px 0;"><div class="step-dot s" style="width:28px; height:28px; font-size:12px;">3</div><div class="step-body"><div class="step-title" style="font-size: 14px;">Wait 10–30 seconds</div><div class="step-desc" style="font-size: 12.5px;">CapCut transcribes your audio into timed lines.</div></div></div>
+      <div class="step-row" style="padding: 8px 0;"><div class="step-dot s" style="width:28px; height:28px; font-size:12px;">4</div><div class="step-body"><div class="step-title" style="font-size: 14px;">Tap each line, fix wrong words</div><div class="step-desc" style="font-size: 12.5px;">~80% accurate; always proofread.</div></div></div>
+    </div>
+    <div class="subtitle-preview">
+      <div class="frame-content"></div>
+      <div class="subtitle-line">This is my <span class="accent">morning</span><br/>routine</div>
+    </div>
+  </div>
+
+  <div class="pro-note" style="margin-top: 22px;"><b>Style rule</b>Pick ONE font, ONE color (white with black outline = always readable), bottom 1/3 of frame. Highlight ONE word per line in your accent color for emphasis.</div>
+</section>
+
+<!-- ============ DAY 3 DIVIDER ============ -->
+<section class="slide" data-label="DAY 03">
+  <div class="blob blob-s" style="top:-120px; left:-100px; width:380px; height:380px;"></div>
+  <div class="blob blob-m" style="bottom:-120px; right:-100px; width:340px; height:340px;"></div>
+  <div class="section-hero">
+    <div class="eyebrow s">Session 03 · 60 minutes</div>
+    <div class="sec-num" style="background: linear-gradient(135deg, var(--sky), var(--mint)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">DAY 03</div>
+    <div class="sec-line" style="background: linear-gradient(90deg, var(--sky), var(--mint));"></div>
+    <h2>Review &amp; <span class="m">AI tools</span>.</h2>
+    <p class="sub">Today we watch each reel together — celebrate, critique, improve. Then we explore AI video generation: Google Flow and Meta AI as your new B-roll toolkit.</p>
+  </div>
+</section>
+
+<!-- ============ DAY 3 REVIEW SESSION ============ -->
+<section class="slide" data-label="REVIEW SESSION">
+  <div class="blob blob-o" style="top:-100px; left:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow">First half · 30 minutes</div>
+  <h2>Watch. Discuss. <span class="o">Improve</span>.</h2>
+  <p class="sub">Each submitted reel plays in full. Group calls out what worked. Then one specific thing to improve. Instructor closes with a takeaway and shows the fix live.</p>
+  <div class="g4" style="margin-top: 32px;">
+    <div class="lesson-grid-card"><div class="lg-num">01</div><div class="lg-name">Watch</div><div class="lg-desc">Full play-through. No commentary. Just observe.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">02</div><div class="lg-name">One love</div><div class="lg-desc">Anyone calls out a moment that worked. Be specific.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">03</div><div class="lg-name">One improve</div><div class="lg-desc">Constructive. Specific. Actionable, not vague.</div></div>
+    <div class="lesson-grid-card"><div class="lg-num">04</div><div class="lg-name">Take-away</div><div class="lg-desc">Instructor synthesizes. Suggests one fix. Shows it live.</div></div>
+  </div>
+  <div class="compact-callout" style="margin-top: 22px;"><b>Format</b>~5 minutes per reel · 6 students · 30 minutes total. Then we move to AI tools for the second half.</div>
+</section>
+
+<!-- ============ LESSON 9 — GOOGLE FLOW ============ -->
+<section class="slide" data-label="LESSON 09 · GOOGLE FLOW">
+  <div class="blob blob-s" style="top:-120px; right:-100px; width:380px; height:380px;"></div>
+  <div class="eyebrow s">Lesson 09 of 10 · AI video generation</div>
+  <h2>Google <span class="s">Flow</span>.</h2>
+  <p class="sub">Don't have the B-roll you need? Generate it. Google's Flow (powered by Veo) turns a text prompt into an 8-second cinematic clip in 30 seconds. Drop it in your timeline as B-roll.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 880px; margin-top: 22px;">
+    <div class="ai-card flow">
+      <div class="ai-tag">AI · text-to-video</div>
+      <div class="ai-name">labs.google/flow</div>
+      <div class="ai-desc"><b>How it works:</b> Sign in → New Scene → type a prompt → wait 30–60 sec → download MP4 → drop into CapCut as B-roll.</div>
+      <ol style="padding-left: 18px; font-size: 13px; color: var(--sub); line-height: 1.6; margin-top: 4px;">
+        <li>Visit <b>labs.google/flow</b></li>
+        <li>Sign in with Google account</li>
+        <li>Click <b>New Scene</b> → type your prompt</li>
+        <li>Wait, review, download MP4</li>
+        <li>Import into CapCut as B-roll</li>
+      </ol>
+      <a class="ai-link" href="https://labs.google/flow" target="_blank" rel="noopener">↗ labs.google/flow</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="prompt-box">
+        <div class="pb-label">★ Prompt formula</div>
+        [Subject] + [action] + [setting] + [time of day] + [shot style] + [mood/lighting]
+      </div>
+      <div class="prompt-box">
+        <div class="pb-label">Example 1</div>
+        "A young person walking through a foggy forest at dawn, slow motion, cinematic, golden hour."
+      </div>
+      <div class="prompt-box">
+        <div class="pb-label">Example 2</div>
+        "Drone shot flying over Indian rice paddies at sunset, cinematic wide shot."
+      </div>
+    </div>
+  </div>
+
+  <div class="pro-note" style="margin-top: 18px;"><b>Limits</b>8-second clips · free tier has daily caps · some prompts get rejected (real faces, copyrighted styles). Mix AI with real footage so it doesn't feel uncanny.</div>
+</section>
+
+<!-- ============ LESSON 10 — META AI ============ -->
+<section class="slide" data-label="LESSON 10 · META AI">
+  <div class="blob blob-v" style="top:-120px; left:-100px; width:380px; height:380px;"></div>
+  <div class="eyebrow v">Lesson 10 of 10 · AI animation</div>
+  <h2>Meta <span class="v">AI</span> &amp; frame morphing.</h2>
+  <p class="sub">Have a still photo you want to animate? Meta AI adds subtle motion — wind in trees, water rippling, hair moving. Or feed it two frames and AI generates the smooth morph between them.</p>
+
+  <div class="g2" style="margin-top: 22px; max-width: 880px;">
+    <div class="ai-card meta">
+      <div class="ai-tag">Use case 01 · animate a still</div>
+      <div class="ai-name">Image → moving video</div>
+      <ol style="padding-left: 18px; font-size: 13px; color: var(--sub); line-height: 1.6; margin-top: 6px;">
+        <li>Visit <b>meta.ai</b> · sign in</li>
+        <li>Upload your still photo</li>
+        <li>Type "<i>animate this with subtle wind in the trees</i>"</li>
+        <li>Wait ~30 seconds</li>
+        <li>Download the 4-sec clip → drop into CapCut as moody B-roll</li>
+      </ol>
+      <a class="ai-link" href="https://meta.ai" target="_blank" rel="noopener">↗ meta.ai</a>
+    </div>
+    <div class="ai-card meta">
+      <div class="ai-tag">Use case 02 · frame interpolation</div>
+      <div class="ai-name">Frame 1 → Frame 2</div>
+      <ol style="padding-left: 18px; font-size: 13px; color: var(--sub); line-height: 1.6; margin-top: 6px;">
+        <li>Take 2 photos: same scene, different moments</li>
+        <li>Use <b>Runway ML</b> or <b>Kling AI</b> (frame-to-frame mode)</li>
+        <li>Upload both frames as start/end</li>
+        <li>AI generates the smooth morph between them</li>
+        <li>Result: a "morphing" 2–4 sec clip</li>
+      </ol>
+      <a class="ai-link" href="https://runwayml.com" target="_blank" rel="noopener">↗ runwayml.com · kling.ai · pika.art</a>
+    </div>
+  </div>
+
+  <div class="pro-note" style="margin-top: 18px;"><b>The recipe</b>AI-generated B-roll works best at <b>~25%</b> of your video. Mix with your real footage. 100% AI feels uncanny; 25% feels like magic.</div>
+</section>
+
+<!-- ============ 20. FINAL PROJECT ============ -->
+<section class="slide" data-label="FINAL PROJECT">
+  <div class="blob blob-o" style="top:-100px; left:-100px; width:340px; height:340px;"></div>
+  <div class="blob blob-v" style="bottom:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow">Final project</div>
+  <h2>The submission.</h2>
+  <div class="final-card" style="margin-top: 28px;">
+    <div class="f-quote">"My story,<br>in <em>sixty seconds</em>."</div>
+    <p style="font-size: 15px; color: var(--sub); line-height: 1.6;">Make a portrait reel about anything you genuinely love — a hobby, a pet, a place, a person, a routine. Build it with everything you've learned across the two days.</p>
+    <div class="f-stats">
+      <div class="f-stat"><div class="k">Length</div><div class="v">45–60 sec</div></div>
+      <div class="f-stat"><div class="k">Format</div><div class="v">9 : 16</div></div>
+      <div class="f-stat"><div class="k">Export</div><div class="v">MP4 · 1080p</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 21. SUBMISSION CHECKLIST ============ -->
+<section class="slide" data-label="CHECKLIST">
+  <div class="blob blob-m" style="top:-100px; right:-100px; width:340px; height:340px;"></div>
+  <div class="eyebrow m">Submission checklist</div>
+  <h2>Before you <span class="m">submit</span>.</h2>
+  <p class="sub">Tap each one to tick it off as you finish.</p>
+  <div class="checklist" id="checklist" style="margin-top: 28px;">
+    <div class="check-row"><div class="ch-box"></div><div class="ch-text">At least 4 different clips (B-roll variety)</div></div>
+    <div class="check-row"><div class="ch-box"></div><div class="ch-text">Background music with fade in / fade out</div></div>
+    <div class="check-row"><div class="ch-box"></div><div class="ch-text">One voice-over line (intro or outro)</div></div>
+    <div class="check-row"><div class="ch-box"></div><div class="ch-text">At least 2 transitions, one of them portrait-style</div></div>
+    <div class="check-row"><div class="ch-box"></div><div class="ch-text">One masking effect or text-behind-subject</div></div>
+    <div class="check-row"><div class="ch-box"></div><div class="ch-text">Captions or on-screen text</div></div>
+    <div class="check-row"><div class="ch-box"></div><div class="ch-text">Your name in the end card</div></div>
+    <div class="check-row"><div class="ch-box"></div><div class="ch-text">Uploaded to the shared Drive folder</div></div>
+  </div>
+</section>
+
+<!-- ============ 22. EDITOR'S CODE ============ -->
+<section class="slide" data-label="EDITOR'S CODE">
+  <div class="blob blob-a" style="top:-120px; left:-100px; width:340px; height:340px; background: var(--amber);"></div>
+  <div class="eyebrow a">Six rules · tape them to your wall</div>
+  <h2>The editor's <span class="a">code</span>.</h2>
+  <div class="g3" style="margin-top: 32px; max-width: 1000px;">
+    <div class="code-rule"><div class="cr-num">RULE 01</div><div class="cr-title">Cut sooner than you think.</div><div class="cr-desc">If you're bored watching, your audience left two seconds ago.</div></div>
+    <div class="code-rule"><div class="cr-num">RULE 02</div><div class="cr-title">Music first. Always.</div><div class="cr-desc">Pick the soundtrack before the cut. Then edit to the beat.</div></div>
+    <div class="code-rule"><div class="cr-num">RULE 03</div><div class="cr-title">Less is more.</div><div class="cr-desc">Two effects. One transition style. One filter. Restraint reads pro.</div></div>
+    <div class="code-rule"><div class="cr-num">RULE 04</div><div class="cr-title">Voice equals story.</div><div class="cr-desc">A 5-sec voice-over upgrades any reel from clips to story.</div></div>
+    <div class="code-rule"><div class="cr-num">RULE 05</div><div class="cr-title">Variety in shots.</div><div class="cr-desc">Wide, close, movement, face, hero. Five shots make a story.</div></div>
+    <div class="code-rule"><div class="cr-num">RULE 06</div><div class="cr-title">Done beats perfect.</div><div class="cr-desc">Export and ship. The next one will be better. The fiftieth will be great.</div></div>
+  </div>
+</section>
+
+<!-- ============ 23. CLOSING ============ -->
+<section class="slide" data-label="CLOSING">
+  <div class="blob blob-o" style="top:-160px; left:-120px; width:420px; height:420px;"></div>
+  <div class="blob blob-s" style="bottom:-160px; right:-120px; width:380px; height:380px;"></div>
+  <div class="badge">▸ now go make something</div>
+  <h1>Roll <span class="o">camera.</span></h1>
+  <div class="cover-rule"></div>
+  <p class="sub">Two days. Six lessons. One reel that's yours. Let's get into it.</p>
+  <div style="margin-top: 36px; font-family: 'Sora'; font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase;">
+    Video Editing Workshop · Spring 2026
+  </div>
+</section>
+
+</div>
+
+<div id="nav-backdrop"></div>
+<aside id="nav-menu">
+  <div id="nav-menu-header">
+    <h3>Slide Navigator</h3>
+    <div class="hint">Press <kbd>M</kbd> to toggle · click any slide</div>
+  </div>
+  <div id="nav-menu-list"></div>
+</aside>
+
+<div id="nav">
+  <button id="prev">‹ Prev</button>
+  <span id="ctr">01 / 23</span>
+  <button id="next">Next ›</button>
+  <button id="menu-toggle" title="Slide menu (M)">☰</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let cur = 0;
+
+  const ctr   = document.getElementById('ctr');
+  const prog  = document.getElementById('prog');
+  const label = document.getElementById('slide-label');
+  const prev  = document.getElementById('prev');
+  const next  = document.getElementById('next');
+
+  // ===== Build slide navigator menu =====
+  const menuList = document.getElementById('nav-menu-list');
+  const navMenu = document.getElementById('nav-menu');
+  const navBackdrop = document.getElementById('nav-backdrop');
+  function buildMenu() {
+    menuList.innerHTML = '';
+    slides.forEach((s, i) => {
+      const item = document.createElement('div');
+      item.className = 'menu-item';
+      item.innerHTML = '<span class="mi-num">' + String(i+1).padStart(2,'0') + '</span><span class="mi-title">' + (s.dataset.label || 'Slide ' + (i+1)) + '</span>';
+      item.addEventListener('click', () => { show(i); closeMenu(); });
+      menuList.appendChild(item);
+    });
+  }
+  function updateMenuActive() {
+    const items = menuList.querySelectorAll('.menu-item');
+    items.forEach((it, idx) => it.classList.toggle('active', idx === cur));
+    const active = menuList.querySelector('.menu-item.active');
+    if (active && navMenu.classList.contains('open')) active.scrollIntoView({ block: 'nearest' });
+  }
+  function openMenu() { navMenu.classList.add('open'); navBackdrop.classList.add('open'); updateMenuActive(); }
+  function closeMenu() { navMenu.classList.remove('open'); navBackdrop.classList.remove('open'); }
+  function toggleMenu() { navMenu.classList.contains('open') ? closeMenu() : openMenu(); }
+  navBackdrop.addEventListener('click', closeMenu);
+  document.getElementById('menu-toggle').addEventListener('click', toggleMenu);
+  buildMenu();
+
+  function show(i) {
+    if (i < 0 || i >= total) return;
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    cur = i;
+    slides[cur].classList.remove('exit');
+    slides[cur].classList.add('active');
+    ctr.textContent = String(cur + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    label.textContent = slides[cur].dataset.label || '';
+    prog.style.width = ((cur + 1) / total * 100) + '%';
+    prev.disabled = cur === 0;
+    next.disabled = cur === total - 1;
+    document.body.classList.toggle('on-cover', cur === 0);
+    updateMenuActive();
+  }
+
+  prev.onclick = () => show(cur - 1);
+  next.onclick = () => show(cur + 1);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(cur - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(total - 1);
+    else if (e.key === 'm' || e.key === 'M') { e.preventDefault(); toggleMenu(); }
+    else if (e.key === 'Escape') { closeMenu(); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  show(0);
+
+  // Checklist toggle
+  document.querySelectorAll('#checklist .check-row').forEach(r => {
+    r.addEventListener('click', () => r.classList.toggle('done'));
+  });
+</script>
+
+</body>
+</html>

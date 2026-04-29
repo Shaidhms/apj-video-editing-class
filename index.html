@@ -1154,15 +1154,11 @@ b, strong { color: var(--white); }
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding: 10px 8px 14px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.18) transparent;
+  scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
 }
-.reel-track::-webkit-scrollbar { height: 5px; }
-.reel-track::-webkit-scrollbar-track { background: transparent; }
-.reel-track::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 3px; }
-.reel-track::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+.reel-track::-webkit-scrollbar { display: none; }
 .reel-card {
   flex: 0 0 auto;
   width: 200px;
@@ -2074,7 +2070,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
           <div class="reel-placeholder"><div class="num">01</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #1</b> · @ai360_with_shaid</div>
+        <div class="reel-caption"><b>Cinematic hook + grid cut</b></div>
       </div>
       <div class="reel-card r2">
         <div class="reel-frame">
@@ -2082,7 +2078,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
           <div class="reel-placeholder"><div class="num">02</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #2</b> · @ai360_with_shaid</div>
+        <div class="reel-caption"><b>Prompt → image reveal</b></div>
       </div>
       <div class="reel-card r3">
         <div class="reel-frame">
@@ -2090,7 +2086,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
           <div class="reel-placeholder"><div class="num">03</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #3</b> · @ai360_with_shaid</div>
+        <div class="reel-caption"><b>3D isometric prompt</b></div>
       </div>
       <div class="reel-card r4">
         <div class="reel-frame">
@@ -2098,7 +2094,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
           <div class="reel-placeholder"><div class="num">04</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #4</b> · @ai360_with_shaid</div>
+        <div class="reel-caption"><b>Pop-culture cold open</b></div>
       </div>
       <div class="reel-card r5">
         <div class="reel-frame">
@@ -2106,7 +2102,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
           <div class="reel-placeholder"><div class="num">05</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #5</b> · @ai360_with_shaid</div>
+        <div class="reel-caption"><b>Talking head + PiP</b></div>
       </div>
       <div class="reel-card r1">
         <div class="reel-frame">
@@ -2114,7 +2110,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
           <div class="reel-placeholder"><div class="num">06</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #6</b> · @ai360_with_shaid</div>
+        <div class="reel-caption"><b>Stat + listicle cards</b> · text animation</div>
       </div>
       <div class="reel-card r2">
         <div class="reel-frame">
@@ -2122,7 +2118,7 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
           <div class="reel-placeholder"><div class="num">07</div><div class="label">hover to play</div></div>
           <div class="reel-play"></div>
         </div>
-        <div class="reel-caption"><b>Reel #7</b> · @ai360_with_shaid</div>
+        <div class="reel-caption"><b>A/B comparison</b> · text animation</div>
       </div>
     </div>
     <button class="reel-arrow next" aria-label="Next">›</button>

@@ -1118,6 +1118,66 @@ b, strong { color: var(--white); }
 }
 #nav-backdrop.open { opacity: 1; pointer-events: all; }
 
+/* ── SOCIAL CARDS (feedback slide · QR codes) ── */
+.social-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  width: 100%;
+  max-width: 880px;
+  margin: 26px auto 0;
+}
+.social-card {
+  background: white;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #181412;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  border-top: 4px solid var(--orange);
+}
+.social-card.linkedin { border-top-color: #0A66C2; }
+.social-card.instagram { border-top-color: #E4405F; }
+.social-card.youtube { border-top-color: #FF0000; }
+.social-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+}
+.social-card .qr-wrap {
+  width: 100%;
+  aspect-ratio: 1;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.social-card .qr-wrap img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.social-card .platform {
+  font-family: 'Sora'; font-weight: 700; font-size: 10px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: #6B6B6B;
+}
+.social-card .handle {
+  font-family: 'Sora'; font-weight: 600; font-size: 12.5px;
+  color: #181412; text-align: center;
+  word-break: break-word;
+}
+.slide.active .social-card:nth-child(1) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.30s both; }
+.slide.active .social-card:nth-child(2) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.42s both; }
+.slide.active .social-card:nth-child(3) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.54s both; }
+.slide.active .social-card:nth-child(4) { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.66s both; }
+@media (max-width: 720px) {
+  .social-grid { grid-template-columns: repeat(2, 1fr); max-width: 380px; }
+}
+
 /* ── COVER CENTERED LOGO (bigger) ── */
 .cover-logo {
   height: 150px; width: auto;
@@ -2808,23 +2868,28 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
   <div class="badge" style="background: linear-gradient(135deg, rgba(255,192,67,0.18), rgba(34,238,160,0.10)); border-color: rgba(255,192,67,0.4); color: var(--amber);">▸ One last minute</div>
   <h1>Feedback <span class="a">time.</span></h1>
   <div class="cover-rule"></div>
-  <p class="sub">Start giving your feedback. Tell us what worked, what didn't, and what you'd want next.</p>
-  <div class="g3" style="margin-top: 32px;">
-    <div class="lesson-grid-card">
-      <div class="lg-num">01</div>
-      <div class="lg-name">What worked</div>
-      <div class="lg-desc">The lesson, the demo, the moment that made it click.</div>
-    </div>
-    <div class="lesson-grid-card">
-      <div class="lg-num">02</div>
-      <div class="lg-name">What didn't</div>
-      <div class="lg-desc">Be specific. Pacing? Concept? Tool? Any sticking points.</div>
-    </div>
-    <div class="lesson-grid-card">
-      <div class="lg-num">03</div>
-      <div class="lg-name">What's next</div>
-      <div class="lg-desc">What you'd want covered next. AI? Audio? Storytelling?</div>
-    </div>
+  <p class="sub">How was the session? Rate the teaching, share what worked — and follow me on the socials.</p>
+  <div class="social-grid">
+    <a class="social-card website" href="https://www.shaid360.com" target="_blank" rel="noopener">
+      <div class="qr-wrap"><img src="qr-website.svg" alt="Website QR"></div>
+      <div class="platform">Website</div>
+      <div class="handle">shaid360.com</div>
+    </a>
+    <a class="social-card linkedin" href="https://www.linkedin.com/in/shaid360" target="_blank" rel="noopener">
+      <div class="qr-wrap"><img src="qr-linkedin.svg" alt="LinkedIn QR"></div>
+      <div class="platform">LinkedIn</div>
+      <div class="handle">/in/shaid360</div>
+    </a>
+    <a class="social-card instagram" href="https://www.instagram.com/ai360_with_shaid" target="_blank" rel="noopener">
+      <div class="qr-wrap"><img src="qr-instagram.svg" alt="Instagram QR"></div>
+      <div class="platform">Instagram</div>
+      <div class="handle">@ai360_with_shaid</div>
+    </a>
+    <a class="social-card youtube" href="https://youtube.com/@ai360_with_shaid" target="_blank" rel="noopener">
+      <div class="qr-wrap"><img src="qr-youtube.svg" alt="YouTube QR"></div>
+      <div class="platform">YouTube</div>
+      <div class="handle">@ai360_with_shaid</div>
+    </a>
   </div>
 </section>
 

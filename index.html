@@ -1461,6 +1461,46 @@ b, strong { color: var(--white); }
   text-align: center;
 }
 .slide.active .feedback-qr-card { animation: stepUp 0.55s cubic-bezier(.2,1.4,.4,1) 0.40s both; }
+.feedback-link {
+  margin: 20px auto 0;
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 6px;
+  align-items: center;
+}
+.feedback-link input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: rgba(255,255,255,0.85);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  padding: 8px 10px;
+  text-overflow: ellipsis;
+}
+.feedback-copy-btn {
+  background: var(--amber);
+  color: #181412;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-family: 'Sora';
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+.feedback-copy-btn:hover { transform: translateY(-1px); }
+.feedback-copy-btn.copied { background: var(--mint); }
+.slide.active .feedback-link { animation: fadeUp 0.5s ease 0.55s both; }
 
 /* ── COVER CENTERED LOGO (bigger) ── */
 .cover-logo {
@@ -3238,6 +3278,10 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
       <div class="feedback-qr-label">Scan to share feedback</div>
     </div>
   </div>
+  <div class="feedback-link">
+    <input type="text" id="feedback-url" value="https://docs.google.com/forms/d/e/1FAIpQLScZxDs8sZxJzl-4dCf6wF5iVD3jz6jkZFYKZZ3CluUxMKFVOA/viewform" readonly>
+    <button class="feedback-copy-btn" onclick="copyFeedbackLink(this)">Copy link</button>
+  </div>
 </section>
 
 <!-- ============ CLOSING 4 · FOLLOW ME ============ -->
@@ -3299,6 +3343,28 @@ h2 { max-width: 1100px; margin-left: auto; margin-right: auto; padding: 0 8px; }
 </div>
 
 <script>
+  function copyFeedbackLink(btn) {
+    const input = document.getElementById('feedback-url');
+    navigator.clipboard.writeText(input.value).then(() => {
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1500);
+    }).catch(() => {
+      input.select();
+      document.execCommand('copy');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy link';
+        btn.classList.remove('copied');
+      }, 1500);
+    });
+  }
+
   const slides = document.querySelectorAll('.slide');
   const total = slides.length;
   let cur = 0;
